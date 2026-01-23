@@ -1,0 +1,14 @@
+GET /v2/users/by-product
+  ?product_id={BUNDLE_ID}
+  &product_type=bundle
+
+Bundle = Program
+Users returned = cohort members
+
+This endpoint answers ONLY ONE QUESTION:
+“Who has access to this product (bundle / course / subscription)?”
+
+It gives you:
+
+✅ User list
+✅ Enrollment evidence

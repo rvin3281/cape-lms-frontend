@@ -33,9 +33,17 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# but allow a template/example
+!.env.development
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local planning & notes (do not commit)
+api-planning/
+notes/
+my-git-command/
