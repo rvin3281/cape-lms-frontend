@@ -1,6 +1,6 @@
 import { Card, CardContent } from "../ui/card";
 
-function FormErrorDisplay({ message, items }: { message: string; items?: [] }) {
+function FormErrorDisplay({ message }: { message: string; items?: [] }) {
   return (
     <Card className="border border-red-500 bg-white rounded-xl py-3 mb-4">
       <CardContent className="flex flex-col gap-1">

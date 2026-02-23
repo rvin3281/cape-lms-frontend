@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+Dockerfile
+docker
+.env*
+!.env.development
+!.env.production
+cape-dev

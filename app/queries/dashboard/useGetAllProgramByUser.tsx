@@ -5,7 +5,7 @@ import { QueryFunctionContext, useQuery } from "@tanstack/react-query";
 type UserProgramQueryKey = readonly ["user-program", string | undefined];
 
 const getAllProgramByUser = async (
-  ctx: QueryFunctionContext<UserProgramQueryKey>
+  ctx: QueryFunctionContext<UserProgramQueryKey>,
 ) => {
   const [, email] = ctx.queryKey;
 
@@ -14,6 +14,8 @@ const getAllProgramByUser = async (
   if (!email) throw new Error("Email is required");
 
   const res = await axiosInstance.get(`${GET_ALL_PROGRAM_BY_USER}/${email}`);
+
+  console.log("GET ALL PROGRAM BY USER RES:", res);
 
   return res.data;
 };

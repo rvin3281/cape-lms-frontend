@@ -18,9 +18,16 @@ import {
   SidebarMenuSubItem,
 } from "../ui/sidebar";
 
-function NavGroupItem({ item, pathname }: { item: NavItem; pathname: string }) {
+function NavGroupItem({
+  item,
+  pathname,
+  onNavigate,
+}: {
+  item: NavItem;
+  pathname: string;
+  onNavigate: () => void;
+}) {
   const hasChildren = (item.items?.length ?? 0) > 0;
-  if (!hasChildren) return null;
 
   const isAnyChildActive = item.items!.some((sub) =>
     isExactActive(pathname, sub.url),
@@ -33,6 +40,8 @@ function NavGroupItem({ item, pathname }: { item: NavItem; pathname: string }) {
   useEffect(() => {
     setOpen(active);
   }, [active]);
+
+  if (!hasChildren) return null;
 
   return (
     <Collapsible
@@ -64,6 +73,7 @@ function NavGroupItem({ item, pathname }: { item: NavItem; pathname: string }) {
                   >
                     <Link
                       href={subItem.url}
+                      onClick={onNavigate}
                       className={[
                         "block w-full",
                         "pl-4 py-2",

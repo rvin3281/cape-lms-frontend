@@ -7,11 +7,11 @@ async function DashboardLayoutAdmin({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+  // const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   // await new Promise((res) => setTimeout(res, 3000));
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={true}>
       <div className="flex w-full">
         {/* NAVBAR */}
         <AppSidebarAdmin />

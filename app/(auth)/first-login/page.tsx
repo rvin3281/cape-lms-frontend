@@ -1,5 +1,6 @@
 import FirstTimeLoginComponent from "@/components/auth/FirstTimeLoginComponent";
 import LoginHeader from "@/components/auth/LoginHeader";
+import { Suspense } from "react";
 import LoginFormContainer from "../../../components/auth/LoginFormContainer";
 
 function FirstLoginPage() {
@@ -13,7 +14,9 @@ function FirstLoginPage() {
             description="Enter your registered email to begin first-time setup."
           />
         </div>
-        <FirstTimeLoginComponent />
+        <Suspense fallback={<div className="mt-4">Loading...</div>}>
+          <FirstTimeLoginComponent />
+        </Suspense>
       </div>
     </LoginFormContainer>
   );

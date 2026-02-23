@@ -72,11 +72,7 @@ export type TFirstTimeSetPasswordSchema = z.infer<
 
 export const OnboardingAccountInformationSchema = z.object({
   firstName: z.string().min(1, "First Name is required"),
-  // firstName: z.string(),
-
   lastName: z.string().min(1, "Last Name is required"),
-  // lastName: z.string(),
-
   email: z.email({ message: "Please enter a valid email address" }),
   phoneNumber: z
     .string()
@@ -121,3 +117,56 @@ export type TOnboardingAccountInformationSchema = z.infer<
 >;
 
 /** ============================================ Onboarding - Account Information ================================= */
+
+export const UpdateUserProfileCareerSchema = z.object({
+  currentRole: z.string().min(1, "Current role is required"),
+  targetRole: z.string().min(1, "Target role is required"),
+  industry: z.string().min(1, "Industry is required"),
+  careerGoals: z
+    .string()
+    .trim()
+    .min(1, "Career goals is required")
+    .refine((value) => value.length >= 10, {
+      message: "Career goals must be at least 10 characters long",
+    })
+    .refine((value) => value.length <= 250, {
+      message: "Career goals must not exceed 250 characters",
+    }),
+  skills: z
+    .array(z.string().min(1, "Skill cannot be empty")) // each skill must be non-empty
+    .min(1, "Please add at least one skill") // at least one skill required
+    .max(20, "You can add up to 20 skills only"), // optional max limit
+});
+
+export type TUpdateUserProfileCareerSchema = z.infer<
+  typeof UpdateUserProfileCareerSchema
+>;
+
+export const UpdateUserProfileAccountSchema = z.object({
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  email: z.email({ message: "Please enter a valid email address" }),
+  phoneNumber: z
+    .string()
+    .trim()
+    .min(1, "Phone number is required")
+    .refine((value) => /^\+?\d+$/.test(value), {
+      message: "Phone number can contain only digits and may start with '+'",
+    })
+    .refine(
+      (value) => {
+        const digitsOnly = value.startsWith("+") ? value.slice(1) : value;
+
+        return digitsOnly.length >= 10 && digitsOnly.length <= 13;
+      },
+      {
+        message: "Phone number must be between 10 and 13 digits",
+      },
+    ),
+  jobTitle: z.string().min(1, "Job title is required"),
+  organization: z.string(),
+});
+
+export type TUpdateUserProfileAccountSchema = z.infer<
+  typeof UpdateUserProfileAccountSchema
+>;

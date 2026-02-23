@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useGetOnboardingUserData } from "@/app/queries/useGetOnboardingUserData";
 
@@ -79,7 +80,7 @@ function ProfileTabs() {
 
   if (isEmpty) {
     return (
-      <div className="mx-auto w-full max-w-[520px] rounded-xl border bg-background p-8">
+      <div className="mx-auto w-full max-w-130 rounded-xl border bg-background p-8">
         <div className="text-base font-semibold text-foreground">
           No profile data yet
         </div>
@@ -95,7 +96,7 @@ function ProfileTabs() {
 
   const accountData: IUserAccount = {
     email: userData.email,
-    firstNam: userData.firstName,
+    firstName: userData.firstName,
     lastName: userData.lastName,
     learnworldId: userData.learnworldId,
     organization: userData.profile.organization,

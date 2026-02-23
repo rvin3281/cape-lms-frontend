@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useGetAllProgramByUser } from "@/app/queries/dashboard/useGetAllProgramByUser";
 import { GetUserProgramsResponse } from "@/lib/interface/IGetUserProgramResponse";
@@ -11,6 +12,8 @@ function ProgramListing() {
   const { data, isLoading, isFetching } = useGetAllProgramByUser(user?.email);
 
   const userProgramData: GetUserProgramsResponse = data?.data?.data;
+
+  // console.log("PROGRAM DATA:", userProgramData);
 
   const programData: {
     productId: string;

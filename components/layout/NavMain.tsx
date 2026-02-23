@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "../ui/sidebar";
 import NavGroupItem from "./NavGroupItem";
 
@@ -36,6 +37,11 @@ export function isSectionActive(pathname: string, url?: string) {
 
 function NavMain({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const closeOnMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <SidebarGroup>
@@ -61,6 +67,7 @@ function NavMain({ items }: { items: NavItem[] }) {
                 >
                   <Link
                     href={item.url ?? "#"}
+                    onClick={closeOnMobile}
                     className={[
                       "group/navitem flex h-10 items-center gap-2 rounded-xl transition-colors",
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300",
@@ -158,7 +165,12 @@ function NavMain({ items }: { items: NavItem[] }) {
           //   </Collapsible>
           // );
           return (
-            <NavGroupItem key={item.title} item={item} pathname={pathname} />
+            <NavGroupItem
+              onNavigate={closeOnMobile}
+              key={item.title}
+              item={item}
+              pathname={pathname}
+            />
           );
         })}
       </SidebarMenu>

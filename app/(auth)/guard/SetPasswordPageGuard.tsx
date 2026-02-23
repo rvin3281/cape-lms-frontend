@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useValidateSetPasswordToken } from "@/app/queries/useValidateSetPasswordToken";
@@ -6,7 +8,7 @@ import { useEffect, useRef } from "react";
 
 function SetPasswordPageGuard({ children }: { children: React.ReactNode }) {
   const searchParam = useSearchParams();
-  console.log(searchParam.get("email"));
+
   const email = searchParam.get("email");
   const token = searchParam.get("token");
 
@@ -31,16 +33,16 @@ function SetPasswordPageGuard({ children }: { children: React.ReactNode }) {
     mutation.mutate(
       { token, email },
       {
-        onSuccess: (data) => {
+        onSuccess: (_data) => {
           //NOTE: USER NOTIFICATION MESSAGE
           // console.log("Token valid", data);
           // stay on page → allow user to set password
         },
-        onError: (error: any) => {
+        onError: (_error) => {
           //NOTE: USER NOTIFICATION MESSAGE
           router.replace("/first-login");
         },
-      }
+      },
     );
   }, [token, email, router]); // no mutation object
 

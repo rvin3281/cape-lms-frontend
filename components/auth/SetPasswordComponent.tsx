@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useSetPassword } from "@/app/queries/useSetPassword";
@@ -82,7 +84,7 @@ function SetPasswordComponent() {
           JSON.stringify({
             email: normalizeEmail,
             at: Date.now(),
-          })
+          }),
         );
 
         router.replace(`/login`);
@@ -212,7 +214,7 @@ function SetPasswordComponent() {
               disabled={isDisabled}
               classname={cn(
                 "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
-                isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm"
+                isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",
               )}
             />
           </div>

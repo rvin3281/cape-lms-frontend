@@ -13,7 +13,6 @@ import {
 import { CohortRow } from "@/lib/types/table-row-types/cohort-row.types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 /**
  * ColumnDef concepts you MUST know (fast, but critical)
@@ -37,7 +36,7 @@ function formatDateFromUnixSeconds(sec: number) {
 
 export function getCohortColumns(
   pageIndex: number,
-  pageSize: number
+  pageSize: number,
 ): ColumnDef<CohortRow>[] {
   return [
     //1st Column: Row Selection (display-only column)
@@ -159,7 +158,7 @@ export function getCohortColumns(
       header: "Action",
       enableHiding: false,
       cell: ({ row }) => {
-        const router = useRouter();
+        // const router = useRouter();
         const cohort = row.original;
 
         return (

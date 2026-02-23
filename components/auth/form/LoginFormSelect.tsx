@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -42,7 +43,7 @@ function LoginFormSelect({
   className,
   ariaInvalid,
   options,
-  field,
+
   value,
   onValueChange,
   disabled,
@@ -90,7 +91,7 @@ function LoginFormSelect({
           `,
           // ✅ mimic your input focus border
           !ariaInvalid && "focus:border-[#00baff]",
-          className
+          className,
         )}
       >
         <SelectValue placeholder={placeholder} />

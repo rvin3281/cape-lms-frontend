@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useProgramSSOAuth } from "@/app/queries/useProgramSSOAuth";
@@ -28,7 +29,7 @@ function ProgramCard({
   title,
   description,
   productId,
-  url,
+
   userEmail,
   level = "Intermediate",
   skills = ["Strategic Planning", "Team Leadership", "Decision Making"],
@@ -42,7 +43,7 @@ function ProgramCard({
 
   const redirectUserToCoursePlayer = (
     userEmail?: string,
-    productId?: string
+    productId?: string,
   ) => {
     if (!productId || !userEmail) {
       toast.error("Unable to launch program. Missing information.");
@@ -93,7 +94,7 @@ function ProgramCard({
             id: toastId,
           });
         },
-      }
+      },
     );
   };
 

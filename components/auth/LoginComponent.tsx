@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useLogin } from "@/app/queries/useLogin";
-import { useAppDispatch } from "@/lib/redux/hooks";
 import { cn } from "@/lib/utils";
 import {
   loginSchema,
@@ -49,7 +50,7 @@ function LoginComponent({
     useState(true);
 
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
   const form = useForm<TLoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -92,8 +93,6 @@ function LoginComponent({
     if (!formError) return;
 
     setFormError(null);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password]);
 
   useEffect(() => {
@@ -129,6 +128,7 @@ function LoginComponent({
         router.replace(next);
       },
       onError: (e) => {
+        console.log("Login error:", e);
         setRedirecting(false);
 
         const resolved = resolveFormError(e);
@@ -376,7 +376,7 @@ function LoginComponent({
             {/* ========================= */}
             {/* subtle helper text */}
             <p className="mt-3 text-center  text-slate-500">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 className="text-bluetext-sm
       text-blue-600

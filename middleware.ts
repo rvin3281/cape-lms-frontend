@@ -16,7 +16,7 @@ function isPublicRoute(pathname: string) {
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   const refreshToken = request.cookies.get("refresh_token")?.value;
 

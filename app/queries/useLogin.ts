@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { LOGIN_API } from "@/lib/constant/api-url";
@@ -22,11 +23,11 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: userLogin,
     mutationKey: ["user", "login"],
-    onSuccess: async (data) => {
+    onSuccess: async (_data) => {
       // ✅ tells app "auth state changed"
       await qc.invalidateQueries({ queryKey: ["auth", "me"] });
     },
-    onError: (error: any) => {
+    onError: (_error: any) => {
       // console.log(JSON.stringify(error, null, 2));
       // console.log("error", error);
     },

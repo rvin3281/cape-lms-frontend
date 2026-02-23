@@ -1,0 +1,25 @@
+"use client";
+
+import LoginFormContainer from "@/components/auth/LoginFormContainer";
+import LoginHeader from "@/components/auth/LoginHeader";
+import SetPasswordComponent from "@/components/auth/SetPasswordComponent";
+import SetPasswordPageGuard from "../../guard/SetPasswordPageGuard";
+
+function SetPasswordClient() {
+  return (
+    <SetPasswordPageGuard>
+      <LoginFormContainer>
+        <div className="mb-2">
+          <div className="flex flex-col gap-5">
+            <LoginHeader
+              title="Create your password"
+              description="Set a new password to secure your account."
+            />
+          </div>
+          <SetPasswordComponent />
+        </div>
+      </LoginFormContainer>
+    </SetPasswordPageGuard>
+  );
+}
+export default SetPasswordClient;

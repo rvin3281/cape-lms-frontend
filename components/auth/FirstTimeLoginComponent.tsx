@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useFirstLogin } from "@/app/queries/useFirstLogin";
@@ -30,7 +32,7 @@ import FormErrorDisplay from "./FormErrorDisplay";
 
 function FirstTimeLoginComponent() {
   // API ERROR
-  const [error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
+  const [_error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
 
   // Form Error
   const [formError, setFormError] = useState<string | null | undefined>(null);
@@ -48,7 +50,7 @@ function FirstTimeLoginComponent() {
   }, [searchParams]);
 
   // React Form Integration
-  const form = useForm({
+  const form = useForm<TFirstTimeLoginEmailSchema>({
     resolver: zodResolver(firstTimeLoginEmailSchema),
     defaultValues: {
       email: "",
@@ -83,7 +85,7 @@ function FirstTimeLoginComponent() {
     if (!formError) return;
 
     setFormError(null);
-  }, [email]);
+  }, [email, formError]);
 
   // First Time Login UseMutation
   const firstTimeLogin = useFirstLogin();
@@ -101,8 +103,8 @@ function FirstTimeLoginComponent() {
 
         router.push(
           `/first-login/set-password?email=${encodeURIComponent(
-            data.data.email
-          )}&token=${data.data.token}`
+            data.data.email,
+          )}&token=${data.data.token}`,
         );
       },
       onError: (error: any) => {
@@ -114,7 +116,7 @@ function FirstTimeLoginComponent() {
           SetSessionStorageUserLogin(form.getValues("email"));
 
           toast.success(
-            "Your account already activated! Please login using your email and password"
+            "Your account already activated! Please login using your email and password",
           );
           router.replace("/login");
           return;
@@ -205,7 +207,7 @@ function FirstTimeLoginComponent() {
               disabled={isDisabled}
               classname={cn(
                 "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
-                isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm"
+                isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",
               )}
             />
           </div>

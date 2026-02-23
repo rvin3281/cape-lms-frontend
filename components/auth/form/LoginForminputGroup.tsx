@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -95,7 +96,7 @@ function LoginFormInputGroup({
           `,
           // reserve space for right icon/slot
           (canToggle || rightSlot) && "pr-12",
-          className
+          className,
         )}
       />
 
@@ -112,7 +113,7 @@ function LoginFormInputGroup({
                 "inline-flex h-9 w-9 items-center justify-center rounded-md",
                 "text-slate-600 hover:text-slate-900",
                 "hover:bg-slate-100 active:bg-slate-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300",
               )}
             >
               {showPassword ? (

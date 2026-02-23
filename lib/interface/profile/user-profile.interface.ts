@@ -21,7 +21,7 @@ export interface IUserAccount {
   userId: string;
   learnworldId: string;
   email: string;
-  firstNam: string;
+  firstName: string;
   lastName: string;
   userName: string;
   organization: string;

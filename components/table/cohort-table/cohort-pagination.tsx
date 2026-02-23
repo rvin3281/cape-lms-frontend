@@ -26,7 +26,7 @@ function getPages(pageIndex: number, pageCount: number) {
 
 export default function CohortPagination({
   pageIndex,
-  pageSize,
+  // pageSize,
   pageCount,
   canPrevious,
   canNext,
@@ -35,7 +35,7 @@ export default function CohortPagination({
   next,
 }: {
   pageIndex: number;
-  pageSize: number;
+  pageSize?: number;
   pageCount: number;
   canPrevious: boolean;
   canNext: boolean;

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useCompleteOnBoarding } from "@/app/queries/useCompleteOnBoarding";
@@ -38,8 +41,6 @@ import OnBoardingAddSkills from "./OnBoardingAddSkills";
 type OnBoardingAccountProps = {
   nextBtnClick: () => void;
 };
-
-const STORAGE_KEY = "onboarding.careerGoals.skills";
 
 function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
   // const [skills, setSkills] = useLocalStorageState<string[]>(STORAGE_KEY, []);
@@ -119,7 +120,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
 
   // Watch the value of careerGoals
   const careerGoalsValue = form.watch("careerGoals") || "";
-  const minChars = 10;
+  // const minChars = 10;
   const maxChars = 250;
 
   useEffect(() => {
@@ -141,7 +142,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
     });
   }, [onBoardingUserData?.email]);
 
-  const { isValid, isSubmitting, isDirty } = form.formState;
+  const { isValid, isDirty } = form.formState;
 
   const onBoardingSubmit = useCompleteOnBoarding();
 
@@ -615,7 +616,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
                               <button
                                 type="button"
                                 onClick={() => removeSkill(item)}
-                                className="ml-2 inline-flex items-center opacity-70 hover:opacity-100"
+                                className="ml-2 inline-flex items-center cursor-pointer opacity-70 hover:opacity-100"
                                 aria-label={`Remove ${item}`}
                               >
                                 <X className="h-3 w-3" />

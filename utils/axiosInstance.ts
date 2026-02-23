@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { REFRESH_API } from "@/lib/constant/api-url";
 import { SET_PASSWORD_TOKEN_NOT_EXIST } from "@/lib/constant/error-code";
+import { ApiErrorPayload } from "@/lib/interface/APIErrorResponse";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 /**
@@ -94,7 +96,7 @@ axiosInstance.interceptors.response.use(
   (res) => res,
 
   // 2) failure responses enter here
-  async (error: AxiosError) => {
+  async (error: AxiosError<ApiErrorPayload>) => {
     // Axios keeps the request config that caused the error
     // This is the original request of an API call, axios stores the fail api call request on error.config
     // So we can take the orignal request of the failed API from error.config
@@ -189,7 +191,7 @@ axiosInstance.interceptors.response.use(
       if (typeof window !== "undefined") window.location.href = "/login";
       throw error;
     }
-  }
+  },
 );
 
 export default axiosInstance;

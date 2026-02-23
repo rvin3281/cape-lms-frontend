@@ -4,7 +4,7 @@ import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 function SidebarFooterContent() {
-  const { toggleSidebar, open, state, openMobile } = useSidebar();
+  const { toggleSidebar, open } = useSidebar();
 
   // console.log(open);
 
