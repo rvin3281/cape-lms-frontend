@@ -1,5 +1,5 @@
 "use client";
-import { Award, BookOpen, Brain, UserRound, Users } from "lucide-react";
+import { Award, BookOpen, Brain, UserRound } from "lucide-react";
 import { FaHome } from "react-icons/fa";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import AppSidebarHeader from "./AppSidebarHeader";
@@ -9,6 +9,7 @@ const data: { navMain: NavItem[] } = {
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: FaHome },
 
+    { title: "Skills", url: "/skills", icon: Brain },
     {
       title: "Programs",
       icon: BookOpen,
@@ -20,9 +21,7 @@ const data: { navMain: NavItem[] } = {
         },
       ],
     },
-
-    { title: "Skills", url: "/skills", icon: Brain },
-    { title: "Community", url: "/community", icon: Users },
+    // { title: "Community", url: "/community", icon: Users },
     { title: "Achievements", url: "/achievement", icon: Award },
     { title: "Profile", url: "/profile", icon: UserRound },
   ],

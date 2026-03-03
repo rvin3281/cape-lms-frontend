@@ -1,6 +1,17 @@
-import React from "react";
 import PageHeader from "@/components/layout/PageHeader";
 import CohortTable from "@/components/reports/CohortTable";
+
+export const metadata = {
+  title: "",
+  description: "",
+  // robots: {
+  //   index: true,
+  //   follow: true,
+  // },
+  // alternates: {
+  //   canonical: `${process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_CONTACT_US}`,
+  // },
+};
 
 function page() {
   return (

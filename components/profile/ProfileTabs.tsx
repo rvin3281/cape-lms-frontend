@@ -133,7 +133,11 @@ function ProfileTabs() {
           </TabsList>
 
           <TabsContent value="account">
-            <ProfileAccount title="Personal Information" data={accountData} />
+            <ProfileAccount
+              userEmail={email}
+              title="Personal Information"
+              data={accountData}
+            />
           </TabsContent>
 
           <TabsContent value="career">

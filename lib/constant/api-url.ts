@@ -11,3 +11,5 @@ export const GET_ALL_PROGRAM_BY_USER = "/user/all-program";
 export const SSO_USER_PROGRAM = "/user/learnworlds/sso";
 export const ONBOARDING_LEARNER = "/auth/onboarding";
 export const GET_USER_ONBOARDING_DATA = "/user/user-profile";
+export const UPDATE_USER_PROFILE_ACCOUNT = "/user/user-profile/account";
+export const UPDATE_USER_PROFILE_CAREER = "/user/user-profile/career";

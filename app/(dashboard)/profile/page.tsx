@@ -3,6 +3,19 @@ import ProfileLearningStats from "@/components/profile/ProfileLearningStats";
 import ProfileOverview from "@/components/profile/ProfileOverview";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 
+export const metadata = {
+  title: "My Profile | CAPE-LMS",
+  description:
+    "View and manage your CAPE-LMS account information, learning statistics, and enrolled program details.",
+  // robots: {
+  //   index: true,
+  //   follow: true,
+  // },
+  // alternates: {
+  //   canonical: `${process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_CONTACT_US}`,
+  // },
+};
+
 function ProfilePage() {
   return (
     <>

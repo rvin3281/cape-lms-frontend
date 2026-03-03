@@ -25,7 +25,7 @@ function AppSidebarHeader() {
               href="#"
             >
               <img
-                src="/images/cape-logo/cape-dashboard-logo.svg"
+                src="/images/cape-logo/Oval UTP.png"
                 alt="CAPE Dashboard"
                 className=" shrink-0 h-13 w-13"
               />

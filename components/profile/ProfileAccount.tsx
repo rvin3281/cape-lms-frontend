@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { useUpdateProfileAccount } from "@/app/queries/useUpdateProfileAccount";
 import { IUserAccount } from "@/lib/interface/profile/user-profile.interface";
 import {
   TUpdateUserProfileAccountSchema,
@@ -16,9 +17,11 @@ import { Input } from "../ui/input";
 import ProfileTabLayout from "./ProfileTabLayout";
 
 function ProfileAccount({
+  userEmail,
   title,
   data,
 }: {
+  userEmail: string;
   title: string;
   data: IUserAccount;
 }) {
@@ -51,15 +54,23 @@ function ProfileAccount({
     form.reset(originalValues);
   }, [originalValues, form]);
 
-  const { isDirty, isValid } = form.formState;
+  const { isDirty, isValid, isSubmitting } = form.formState;
 
   const onReset = () => {
     form.reset(originalValues);
   };
 
+  const updateAccount = useUpdateProfileAccount(userEmail);
+
+  const isDisabled =
+    !isDirty || !isValid || isSubmitting || updateAccount.isPending;
+
   const onSubmit = (values: TUpdateUserProfileAccountSchema) => {
     // Handle form submission logic here
-    console.log("Form submitted with values:", values);
+    // console.log("Form submitted with values:", values);
+    updateAccount.mutate(values, {
+      onSuccess: (data: any) => {},
+    });
   };
 
   return (
