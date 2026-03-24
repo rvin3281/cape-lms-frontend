@@ -10,10 +10,43 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "/dashboard",
+      url: "/admin/dashboard",
       icon: FaHome,
       isActive: false,
     },
+    {
+      title: "Facilitator",
+      url: "#",
+      icon: GiGraduateCap,
+      isActive: false,
+      items: [
+        {
+          title: "View All Facilitators",
+          url: "/admin/facilitator",
+        },
+        {
+          title: "New Facilitator",
+          url: "/admin/facilitator/add-facilitator",
+        },
+      ],
+    },
+    {
+      title: "Program Onboarding",
+      url: "#",
+      icon: GiGraduateCap,
+      isActive: false,
+      items: [
+        {
+          title: "View Program Onboarding",
+          url: "/admin/program-onboarding",
+        },
+        {
+          title: "New Program Onboarding",
+          url: "/admin/program-onboarding/add-program-onboarding",
+        },
+      ],
+    },
+
     {
       title: "Courses",
       url: "#",
@@ -43,7 +76,7 @@ const data = {
 
 function AppSidebarAdmin() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="w-64">
       {/* Sidebar Header */}
       <AppSidebarHeader />
 

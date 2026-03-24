@@ -78,6 +78,33 @@ export const ServerFormError = (errorCode?: string): string => {
     case "LW_CONNECTION_ISSUE":
       return "Something went wrong while we are trying to connect with our system. This may be a temporary issue. Please try again later or contact our support team if the problem persists.";
 
+    case "ROLE_NOT_MATCH":
+      return "Your selected role does not match. Please change your role";
+
+    case "FACILITATOR_NAME_EXIST":
+      return "Facilitator Name Already Exist. Please try again!";
+
+    case "INVALID_USER_ROLE":
+      return "This email is not registered as a classroom learner account.";
+
+    case "USER_ACCOUNT_INACTIVE":
+      return "This account is inactive. Please contact administrator.";
+
+    case "SET_PASSWORD_EMAIL_MISSING":
+      return "Your password setup link is incomplete. Please use the latest link or start again.";
+
+    case "SET_PASSWORD_TOKEN_MISSING":
+      return "Your password setup link is missing required details. Please use the latest link or request a new one.";
+
+    case "SET_PASSWORD_TOKEN_INVALID":
+      return "This password setup link is invalid or has already been used. Please request a new one.";
+
+    case "SET_PASSWORD_TOKEN_EXPIRED":
+      return "This password setup link has expired. Please request a new one.";
+
+    case "SET_PASSWORD_LINK_INVALID":
+      return "We could not verify your password setup link. Please request a new one.";
+
     default:
       return "Something went wrong on our side. Please try again later or contact our support team for assistance.";
   }

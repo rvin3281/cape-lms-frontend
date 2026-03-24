@@ -1,51 +1,119 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useValidateSetPasswordToken } from "@/app/queries/useValidateSetPasswordToken";
+import LoginRedirection from "@/components/loading/LoginRedirection";
+import { Button } from "@/components/ui/button";
+import { resolveFormError } from "@/utils/formErrorResponseHandler";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo } from "react";
+import { toast } from "sonner";
 
 function SetPasswordPageGuard({ children }: { children: React.ReactNode }) {
   const searchParam = useSearchParams();
-
-  const email = searchParam.get("email");
-  const token = searchParam.get("token");
-
-  const mutation = useValidateSetPasswordToken();
   const router = useRouter();
 
-  // 🧠 Memory that survives renders
-  const hasValidatedRef = useRef(false);
+  const email = useMemo(
+    () => searchParam.get("email")?.trim() ?? "",
+    [searchParam],
+  );
+  const token = useMemo(
+    () => searchParam.get("token")?.trim() ?? "",
+    [searchParam],
+  );
+
+  const hasRequiredParams = Boolean(email && token);
+
+  const query = useValidateSetPasswordToken({
+    email,
+    token,
+    enabled: hasRequiredParams,
+  });
 
   useEffect(() => {
-    if (!token || !email) {
-      router.replace("/first-login");
-      return;
+    if (!hasRequiredParams) {
+      toast.error(
+        "Your password setup link is incomplete. Please request a new one.",
+      );
     }
+  }, [hasRequiredParams]);
 
-    // Stop repeated execution
-    if (hasValidatedRef.current) {
-      console.log(hasValidatedRef.current);
-    }
-    hasValidatedRef.current = true;
+  useEffect(() => {
+    if (!query.isError) return;
 
-    mutation.mutate(
-      { token, email },
-      {
-        onSuccess: (_data) => {
-          //NOTE: USER NOTIFICATION MESSAGE
-          // console.log("Token valid", data);
-          // stay on page → allow user to set password
-        },
-        onError: (_error) => {
-          //NOTE: USER NOTIFICATION MESSAGE
-          router.replace("/first-login");
-        },
-      },
+    const resolved = resolveFormError(query.error);
+    const message =
+      "We could not verify your password setup link. Please request a new one.";
+
+    toast.error(message);
+  }, [query.isError, query.error]);
+
+  if (!hasRequiredParams) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-3 text-center">
+            <h2 className="text-xl font-semibold text-slate-900">
+              Invalid setup link
+            </h2>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Your password setup link is incomplete. Please request a new one.
+            </p>
+
+            <div className="pt-2">
+              <Button
+                className="w-full"
+                onClick={() => router.replace("login")}
+              >
+                Back to First Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     );
-  }, [token, email, router]); // no mutation object
+  }
 
-  return <div>{children}</div>;
+  if (query.isPending) {
+    return <LoginRedirection title="Verifying your password setup link..." />;
+  }
+
+  if (query.isError) {
+    const resolved = resolveFormError(query.error);
+    const message =
+      resolved.message ||
+      "We could not verify your password setup link. Please request a new one.";
+
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-3 text-center">
+            <h2 className="text-xl font-semibold text-slate-900">
+              Link verification failed
+            </h2>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              We could not verify your password setup link. Please request a new
+              one.
+            </p>
+
+            <div className="pt-2">
+              <Button
+                className="w-full"
+                onClick={() => router.replace("/login")}
+              >
+                Back to Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (query.isSuccess) {
+    return <>{children}</>;
+  }
+
+  return null;
 }
+
 export default SetPasswordPageGuard;

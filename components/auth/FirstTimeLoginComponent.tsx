@@ -29,8 +29,49 @@ import { ApiErrorPayload } from "./form/ErrorLogin";
 import LoginFormButton from "./form/LoginFormButton";
 import LoginFormInput from "./form/LoginFormInput";
 import FormErrorDisplay from "./FormErrorDisplay";
+import { useFirstLoginClassroom } from "@/app/queries/useFirstLoginClassroom";
 
-function FirstTimeLoginComponent() {
+export type VerifyEmailRole = "hybrid" | "classroom";
+
+const VERIFY_EMAIL_CONTENT: Record<
+  VerifyEmailRole,
+  {
+    bannerTitle: string;
+    bannerDescription: string;
+    submitButtonText: string;
+    loadingText: string;
+    validateErrorToast: string;
+    loginRedirectPath: string;
+    setPasswordBasePath: string;
+  }
+> = {
+  hybrid: {
+    bannerTitle: "Verify your email",
+    bannerDescription:
+      "To continue, we’ll verify your email and send you to the next step to create your password.",
+    submitButtonText: "Validate Email",
+    loadingText: "Validating with LearnWorlds",
+    validateErrorToast: "Failed to validate your email",
+    loginRedirectPath: "/login",
+    setPasswordBasePath: "/verify-email/set-password",
+  },
+  classroom: {
+    bannerTitle: "Verify your classroom email",
+    bannerDescription:
+      "To continue, we’ll verify your classroom learner email and send you to the next step to create your password.",
+    submitButtonText: "Validate Classroom Email",
+    loadingText: "Validating classroom learner access",
+    validateErrorToast: "Failed to validate your classroom email",
+    loginRedirectPath: "/login",
+    setPasswordBasePath: "/verify-email/set-password",
+  },
+};
+
+type FirstTimeLoginComponentProps = {
+  role: VerifyEmailRole;
+};
+
+function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
   // API ERROR
   const [_error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
 
@@ -43,6 +84,8 @@ function FirstTimeLoginComponent() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
+
+  const content = VERIFY_EMAIL_CONTENT[role];
 
   // Normalize only (no validation here; zod will handle it)
   const emailParam = useMemo(() => {
@@ -61,7 +104,6 @@ function FirstTimeLoginComponent() {
 
   const email = form.watch("email");
 
-  // ✅ If email exists in query param, append into RHF input value
   useEffect(() => {
     if (!emailParam) return;
 
@@ -70,99 +112,139 @@ function FirstTimeLoginComponent() {
 
     if (userAlreadyTyped) return;
 
-    // inject query param into the field
     form.setValue("email", emailParam, {
-      shouldValidate: true, // ✅ validate immediately
-      shouldDirty: false, // ✅ optional: don't mark as user-typed
+      shouldValidate: true,
+      shouldDirty: false,
       shouldTouch: false,
     });
-
-    // Optional: validate immediately so error shows if param is invalid
-    // void form.trigger("email");
   }, [emailParam, form]);
 
-  useEffect(() => {
-    if (!formError) return;
+  const hybridFirstLogin = useFirstLogin();
 
-    setFormError(null);
-  }, [email, formError]);
+  const classroomFirstLogin = useFirstLoginClassroom();
 
-  // First Time Login UseMutation
-  const firstTimeLogin = useFirstLogin();
+  const activeMutation =
+    role === "hybrid" ? hybridFirstLogin : classroomFirstLogin;
 
   const { isValid, isSubmitting } = form.formState;
-  const isDisabled = !isValid || isSubmitting || firstTimeLogin.isPending;
+  const isDisabled = !isValid || isSubmitting || activeMutation.isPending;
 
   // Form Submission Handler
+  const handleSuccessfulValidation = (response: any) => {
+    setError(null);
+    setRedirecting(true);
+
+    const resolvedEmail = response?.data?.email ?? form.getValues("email");
+    const resolvedToken = response?.data?.token;
+
+    console.log("SUCCESS RESPONSE", response);
+
+    router.push(
+      `${content.setPasswordBasePath}?email=${encodeURIComponent(
+        resolvedEmail,
+      )}&token=${encodeURIComponent(resolvedToken ?? "")}&role=${role}`,
+    );
+  };
+
+  const handleAlreadyActivatedUser = () => {
+    SetSessionStorageUserLogin(form.getValues("email"));
+
+    toast.success(
+      "Your account is already activated. Please log in using your email and password.",
+    );
+
+    router.replace(content.loginRedirectPath);
+  };
+
+  const handleMutationError = (error: any) => {
+    setRedirecting(false);
+
+    const resolved = resolveFormError(error);
+
+    if (resolved.rawCode === "USER_EXIST_ACTIVE") {
+      handleAlreadyActivatedUser();
+      return;
+    }
+
+    if (resolved.rawCode === "USER_NOT_FOUND") {
+      setFormError(resolved.message);
+      toast.error(content.validateErrorToast);
+      return;
+    }
+
+    if (resolved.rawCode === "INVALID_USER_ROLE") {
+      setFormError(resolved.message);
+      toast.error(content.validateErrorToast);
+      return;
+    }
+
+    if (resolved.rawCode === "USER_ACCOUNT_INACTIVE") {
+      setFormError(resolved.message);
+      toast.error(content.validateErrorToast);
+      return;
+    }
+
+    // setFormError(resolved.message);
+
+    if (resolved.fieldErrors) {
+      Object.entries(resolved.fieldErrors).forEach(([field, message]) => {
+        form.setError(field as any, { type: "server", message });
+      });
+
+      const firstField = Object.keys(resolved.fieldErrors)[0];
+      if (firstField) form.setFocus(firstField as any);
+    }
+
+    toast.error(content.validateErrorToast);
+  };
+
   const onSubmit = (data: TFirstTimeLoginEmailSchema) => {
     setError(null);
-    firstTimeLogin.mutate(data, {
-      onSuccess: (data: any) => {
-        setError(null);
-        setRedirecting(true);
 
-        router.push(
-          `/first-login/set-password?email=${encodeURIComponent(
-            data.data.email,
-          )}&token=${data.data.token}`,
-        );
-      },
-      onError: (error: any) => {
-        setRedirecting(false);
+    if (role === "hybrid") {
+      hybridFirstLogin.mutate(data, {
+        onSuccess: (response: any) => {
+          handleSuccessfulValidation(response);
+        },
+        onError: (error: any) => {
+          handleMutationError(error);
+        },
+      });
 
-        const resolved = resolveFormError(error);
+      return;
+    }
 
-        if (resolved.rawCode === "USER_EXIST_ACTIVE") {
-          SetSessionStorageUserLogin(form.getValues("email"));
-
-          toast.success(
-            "Your account already activated! Please login using your email and password",
-          );
-          router.replace("/login");
-          return;
-        }
-
-        setFormError(resolved.message);
-
-        if (resolved.fieldErrors) {
-          // field-level (RHF)
-          Object.entries(resolved.fieldErrors).forEach(([field, message]) => {
-            form.setError(field as any, { type: "server", message });
-          });
-
-          const firstField = Object.keys(resolved.fieldErrors)[0];
-          if (firstField) form.setFocus(firstField as any);
-        }
-
-        toast.error("Failed to validate your email");
-      },
-    });
+    if (role === "classroom") {
+      classroomFirstLogin.mutate(data, {
+        onSuccess: (response: any) => {
+          handleSuccessfulValidation(response);
+        },
+        onError: (error: unknown) => {
+          handleMutationError(error);
+        },
+      });
+      return;
+    }
   };
 
   return (
     <>
-      {redirecting && <LoginRedirection title="Validating with Learnworlds" />}
+      {redirecting && <LoginRedirection title={content.loadingText} />}
+
       <div className="flex flex-col gap-4 my-4">
         <Card className="border border-blue-200 bg-blue-50/60 rounded-xl py-3 my-3">
           <CardContent className="flex flex-col gap-1">
             <p className="text-blue-900 text-sm leading-relaxed">
-              <span className="font-semibold">Verify your email</span> to
-              continue. We’ll check your email and send you to the next step to
-              create your password.
-            </p>
-            <p className="text-blue-800/80 text-xs leading-relaxed">
-              Tip: Use the same (company/personal) email you used to register in
-              CAPE.
+              <span className="font-semibold">{content.bannerTitle}</span>{" "}
+              {content.bannerDescription}
             </p>
           </CardContent>
         </Card>
 
-        {/* SERVER FORM ERROR */}
         {formError && <FormErrorDisplay message={formError} />}
 
-        {/* FORM ELEMENT */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset disabled={firstTimeLogin.isPending}>
+          <fieldset disabled={activeMutation.isPending || redirecting}>
             <FieldSet>
               <FieldGroup>
                 <Controller
@@ -194,23 +276,24 @@ function FirstTimeLoginComponent() {
                 />
               </FieldGroup>
             </FieldSet>
-          </fieldset>
 
-          {/* Submit Button */}
-          <div className="flex mt-6">
-            <LoginFormButton
-              btnName={
-                firstTimeLogin.isPending ? "Validating..." : "Validate Email"
-              }
-              variant="primary"
-              type="submit"
-              disabled={isDisabled}
-              classname={cn(
-                "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
-                isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",
-              )}
-            />
-          </div>
+            <div className="flex mt-6">
+              <LoginFormButton
+                btnName={
+                  activeMutation.isPending
+                    ? "Validating..."
+                    : content.submitButtonText
+                }
+                variant="primary"
+                type="submit"
+                disabled={isDisabled}
+                classname={cn(
+                  "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
+                  isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",
+                )}
+              />
+            </div>
+          </fieldset>
         </form>
       </div>
     </>

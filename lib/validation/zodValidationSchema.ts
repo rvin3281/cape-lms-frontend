@@ -3,12 +3,18 @@ import * as z from "zod";
 /** ======================================== LOGIN SCHEMA ================================ */
 
 export const loginSchema = z.object({
-  loginContext: z
+  roleCode: z
     .string()
     .min(1, { message: "Please select your login type" })
-    .refine((v) => ["INDIVIDUAL_LEARNER", "ENTERPRISE_LEARNER"].includes(v), {
-      message: "Invalid login type",
-    }),
+    .refine(
+      (v) =>
+        ["INDIVIDUAL_LEARNER", "HYBRID_LEARNER", "CLASSROOM_LEARNER"].includes(
+          v,
+        ),
+      {
+        message: "Invalid login type",
+      },
+    ),
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z
     .string()
@@ -22,7 +28,7 @@ export type TLoginSchema = z.infer<typeof loginSchema>;
 /** ======================================== ADMIN LOGIN SCHEMA =================================== */
 
 export const loginSchemaAdmin = z.object({
-  loginContext: z
+  roleCode: z
     .string()
     .min(1, { message: "Please select your login type" })
     .refine((v) => ["HR_FOCAL_ADMIN", "CAPE_ADMIN"].includes(v), {
@@ -170,3 +176,77 @@ export const UpdateUserProfileAccountSchema = z.object({
 export type TUpdateUserProfileAccountSchema = z.infer<
   typeof UpdateUserProfileAccountSchema
 >;
+
+/** ============================================ PROGRAM ONBOARDING ================================= */
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_MIME = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel", // .xls (older)
+];
+
+export const ProgramOnboardingSchema = z.object({
+  programName: z.string().min(1, "Program Name is Required"),
+  programCohort: z.string().min(1, "Program Cohort is Required"),
+  programDate: z.date({
+    error: "Program Date is required",
+  }),
+  learnerFile: z
+    .instanceof(File, { message: "Excel File is Required" })
+    .refine((file) => ACCEPTED_MIME.includes(file.type), {
+      message: "Only Excel Files (.xlsx, .xls) are allowed",
+    })
+    .refine((file) => file.size <= MAX_FILE_SIZE, {
+      message: "File size must be 10MB or less",
+    }),
+
+  totalFacilitators: z.coerce
+    .number()
+    .min(1, "Please select total facilitators"),
+
+  facilitators: z
+    .array(
+      z.object({
+        facilitatorId: z.string().min(1, "Please select a facilitator"),
+      }),
+    )
+    .min(1, "At least one facilitator is required")
+    .superRefine((items, ctx) => {
+      const seen = new Map<string, number>();
+
+      items.forEach((item, index) => {
+        if (!item.facilitatorId) return;
+
+        const existingIndex = seen.get(item.facilitatorId);
+
+        if (existingIndex !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Duplicate facilitators are not allowed",
+            path: [existingIndex, "facilitatorId"],
+          });
+
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Duplicate facilitators are not allowed",
+            path: [index, "facilitatorId"],
+          });
+        } else {
+          seen.set(item.facilitatorId, index);
+        }
+      });
+    }),
+});
+
+export type TProgramOnboardingFormInput = z.input<
+  typeof ProgramOnboardingSchema
+>;
+export type TProgramOnboardingSchema = z.output<typeof ProgramOnboardingSchema>;
+
+/** ============================================ ADD NEW FACILATOR ================================= */
+
+export const FacilatorSchema = z.object({
+  // facilitatorName: z.string().min(1, "Facilator Name is Required"),
+  facilitatorName: z.string(),
+});
+
+export type TFacilatorSchema = z.infer<typeof FacilatorSchema>;

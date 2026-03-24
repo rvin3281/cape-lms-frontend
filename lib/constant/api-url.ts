@@ -2,6 +2,8 @@ export const LOGIN_API = "/auth/login";
 export const ME_API = "/auth/me";
 export const REFRESH_API = "/auth/refresh";
 export const LOGOUT_API = "/auth/logout";
+export const LEARNWORLDS_VALIDATE_EMAIL_API =
+  "/auth/learnworlds/validate-email";
 export const VALIDATE_EMAIL_API = "/auth/validate-email";
 export const SET_PASSWORD_API = "/auth/set-password";
 export const VALIDATE_PASSWORD_TOKEN_API = "/auth/validate-password-token";
@@ -13,3 +15,5 @@ export const ONBOARDING_LEARNER = "/auth/onboarding";
 export const GET_USER_ONBOARDING_DATA = "/user/user-profile";
 export const UPDATE_USER_PROFILE_ACCOUNT = "/user/user-profile/account";
 export const UPDATE_USER_PROFILE_CAREER = "/user/user-profile/career";
+export const USER_PROGRAM_ONBOARDING = "/program/onboard/learner";
+export const FACILITITATOR = "/facilitator";

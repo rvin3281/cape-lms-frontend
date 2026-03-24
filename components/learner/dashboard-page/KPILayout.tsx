@@ -29,7 +29,7 @@ type KpiItem = {
 function KPILayout() {
   const user = useAppSelector(selectAuthUser);
 
-  console.log("email", user?.email, "enabled", !!user?.email);
+  // console.log("email", user?.email, "enabled", !!user?.email);
 
   const { data: totalCourseData } = useGetOverallActiveCourse(user?.email);
 

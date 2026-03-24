@@ -29,13 +29,28 @@ import LoginFormButton from "./form/LoginFormButton";
 import LoginFormInputGroup from "./form/LoginForminputGroup";
 import FormErrorDisplay from "./FormErrorDisplay";
 
+type PostSetPasswordRole = "hybrid" | "classroom";
+
+function isValidPostSetPasswordRole(
+  value: string | null,
+): value is PostSetPasswordRole {
+  return value === "hybrid" || value === "classroom";
+}
+
 function SetPasswordComponent() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
   const emailQuery = searchParams.get("email");
+  const tokenQuery = searchParams.get("token");
+  const roleQuery = searchParams.get("role");
   // Get the email from query param
   const normalizeEmail = useMemo(() => emailQuery?.trim() || "", [emailQuery]);
+  const normalizetoken = useMemo(() => tokenQuery?.trim() || "", [tokenQuery]);
+
+  const normalizedRole = useMemo<PostSetPasswordRole | null>(() => {
+    return isValidPostSetPasswordRole(roleQuery) ? roleQuery : null;
+  }, [roleQuery]);
 
   // API ERROR
   const [error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
@@ -67,9 +82,11 @@ function SetPasswordComponent() {
 
     const formData: TFirstTimeSetPasswordSchema & {
       email: string | undefined;
+      token: string | undefined;
     } = {
       ...data,
       email: normalizeEmail,
+      token: normalizetoken,
     };
 
     setPassword.mutate(formData, {
@@ -79,13 +96,16 @@ function SetPasswordComponent() {
 
         // NOTE: USER NOTIFICATION MESSAGE
 
-        sessionStorage.setItem(
-          "post_set_password",
-          JSON.stringify({
-            email: normalizeEmail,
-            at: Date.now(),
-          }),
-        );
+        if (normalizedRole) {
+          sessionStorage.setItem(
+            "post_set_password",
+            JSON.stringify({
+              email: normalizeEmail,
+              role: normalizedRole,
+              at: Date.now(),
+            }),
+          );
+        }
 
         router.replace(`/login`);
       },

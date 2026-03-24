@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { VALIDATE_EMAIL_API } from "@/lib/constant/api-url";
+import { LEARNWORLDS_VALIDATE_EMAIL_API } from "@/lib/constant/api-url";
 import { TFirstTimeLoginEmailSchema } from "@/lib/validation/zodValidationSchema";
 import axiosInstance from "@/utils/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 
 const firstLogin = async (data: TFirstTimeLoginEmailSchema): Promise<any> => {
-  const res = await axiosInstance.post(VALIDATE_EMAIL_API, data);
+  const res = await axiosInstance.post(LEARNWORLDS_VALIDATE_EMAIL_API, data);
   return res.data;
 };
 

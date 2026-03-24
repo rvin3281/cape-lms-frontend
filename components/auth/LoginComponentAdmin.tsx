@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client";';
+import { useLogin } from "@/app/queries/useLogin";
+import { cn } from "@/lib/utils";
 import {
   loginSchemaAdmin,
   TLoginSchemaAdmin,
 } from "@/lib/validation/zodValidationSchema";
+import { resolveFormError } from "@/utils/formErrorResponseHandler";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import Link from "next/link";
@@ -23,9 +27,12 @@ import ErrorLogin, { ApiErrorPayload } from "./form/ErrorLogin";
 import LoginFormButton from "./form/LoginFormButton";
 import LoginFormInput from "./form/LoginFormInput";
 import LoginFormSelect from "./form/LoginFormSelect";
+import FormErrorDisplay from "./FormErrorDisplay";
 
 function LoginComponentAdmin() {
   const [error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+
   const [redirecting, setRedirecting] = useState(false);
 
   const skipNextAutoClearRef = useRef(false);
@@ -33,15 +40,29 @@ function LoginComponentAdmin() {
   const form = useForm<TLoginSchemaAdmin>({
     resolver: zodResolver(loginSchemaAdmin),
     defaultValues: {
-      loginContext: "",
+      roleCode: "",
       email: "",
       password: "",
     },
-    mode: "onBlur",
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
+
+  const loginAdmin = useLogin();
+  const { isDirty, isValid, isSubmitting } = form.formState;
+
+  const isDisabled =
+    !isDirty || !isValid || isSubmitting || loginAdmin.isPending;
 
   const email = form.watch("email");
   const password = form.watch("password");
+  const roleCode = form.watch("roleCode");
+
+  useEffect(() => {
+    if (!formError) return;
+
+    setFormError(null);
+  }, [email, password, roleCode]);
 
   useEffect(() => {
     if (!error) return;
@@ -53,17 +74,36 @@ function LoginComponentAdmin() {
 
     setError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, password]);
+  }, [email, password, roleCode]);
 
   const router = useRouter();
 
   const onSubmit = async (values: TLoginSchemaAdmin) => {
-    console.log("LoginComponentAdmin onSubmit values:", values);
+    setError(null);
+    loginAdmin.mutate(values, {
+      onSuccess: (data: any) => {
+        setError(null);
+        setRedirecting(true);
 
-    // Implement useMutation
+        router.replace("/admin/dashboard");
+      },
+      onError: (e) => {
+        console.log("Error", e);
+        setRedirecting(false);
+        const resolved = resolveFormError(e);
+        setFormError(resolved.message);
 
-    // temporary navigate to admin dashboard
-    router.replace("/admin/dashboard");
+        if (resolved.fieldErrors) {
+          // field-level (RHF)
+          Object.entries(resolved.fieldErrors).forEach(([field, message]) => {
+            form.setError(field as any, { type: "server", message });
+          });
+
+          const firstField = Object.keys(resolved.fieldErrors)[0];
+          if (firstField) form.setFocus(firstField as any);
+        }
+      },
+    });
   };
 
   return (
@@ -81,9 +121,7 @@ function LoginComponentAdmin() {
           </CardContent>
         </Card>
 
-        {/* ========================= */}
-        {/* EMAIL / PASSWORD FORM     */}
-        {/* ========================= */}
+        {formError && <FormErrorDisplay message={formError} />}
 
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* <fieldset disabled={loginAdmin.isPending || redirecting}> */}
@@ -93,7 +131,7 @@ function LoginComponentAdmin() {
                 <FieldGroup className="gap-4">
                   {/* Role / Login Context */}
                   <Controller
-                    name="loginContext"
+                    name="roleCode"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
@@ -192,25 +230,18 @@ function LoginComponentAdmin() {
             </FieldGroup>
 
             {/* Remeber me and Forgot Password */}
-            <div className="flex items-end justify-between mt-3">
-              <Link
-                className="text-bluetext-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
-                href="#"
-              >
-                First Time Login?
-              </Link>
-
+            <div className="flex justify-end mt-3">
               <Link
                 className="text-bluetext-sm
-      text-blue-600
-      hover:text-blue-700
-      hover:underline
-      underline-offset-4
-      transition-colors
-      focus:outline-none
-      focus-visible:ring-2
-      focus-visible:ring-blue-500
-      rounded-sm"
+                text-blue-600
+                hover:text-blue-700
+                hover:underline
+                underline-offset-4
+                transition-colors
+                focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-blue-500
+                rounded-sm"
                 href="#"
               >
                 Forgot Password?
@@ -220,51 +251,20 @@ function LoginComponentAdmin() {
             {/* Submit Button */}
             <div className="flex mt-6">
               <LoginFormButton
-                // btnName={
-                //   loginAdmin.isPending ? "Logging in..." : "Sign In As Learner"
-                // }
-                btnName="Sign In As Admin"
+                btnName={
+                  loginAdmin.isPending ? "Logging in..." : "Sign In As Admin"
+                }
                 variant="primary"
                 type="submit"
-                classname="w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition"
+                disabled={isDisabled}
+                classname={cn(
+                  "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
+                  isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",
+                )}
               />
             </div>
           </fieldset>
         </form>
-
-        {/* ========================= */}
-        {/* OAuth SEPARATOR (OR)      */}
-        {/* ========================= */}
-        {/* <div className="flex items-center gap-4 my-4">
-          <div className="flex-1 h-px bg-slate-200" />
-          <span className="text-xs font-medium text-slate-500 uppercase">
-            OR
-          </span>
-          <div className="flex-1 h-px bg-slate-200" />
-        </div> */}
-
-        {/* ========================= */}
-        {/* SIGN UP LINK              */}
-        {/* ========================= */}
-        {/* subtle helper text */}
-        {/* <p className="mt-3 text-center  text-slate-500">
-          Don't have an account?{" "}
-          <Link
-            className="text-bluetext-sm
-      text-blue-600
-      hover:text-blue-700
-      hover:underline
-      underline-offset-4
-      transition-colors
-      focus:outline-none
-      focus-visible:ring-2
-      focus-visible:ring-blue-500
-      rounded-sm"
-            href="#"
-          >
-            Sign up Free
-          </Link>
-        </p> */}
       </div>
     </>
   );

@@ -5,8 +5,8 @@ const PUBLIC_ROUTES = [
   "/register",
   "/forgot-password",
   "/reset-password",
-  "/first-login",
-  "/first-login/set-password",
+  "/verify-email",
+  "/verify-email/set-password",
 ];
 
 function isPublicRoute(pathname: string) {
@@ -19,34 +19,62 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const refreshToken = request.cookies.get("refresh_token")?.value;
+  const scope = request.cookies.get("auth_scope")?.value;
+
+  const isLoggedIn = Boolean(refreshToken);
+  const isAdmin = scope === "admin";
 
   // 0) Root: always redirect somewhere
   if (pathname === "/") {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
     return NextResponse.redirect(
-      new URL(refreshToken ? "/dashboard" : "/login", request.url),
+      new URL(isAdmin ? "/admin/dashboard" : "/dashboard", request.url),
     );
   }
 
   // 1) Public routes (login/register/forgot/reset)
   if (isPublicRoute(pathname)) {
-    // If logged in and trying to access /login, redirect to dashboard
-    if (refreshToken && pathname === "/login") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+    // If logged in and trying to access /login, redirect by scope
+    if (isLoggedIn && pathname === "/login") {
+      return NextResponse.redirect(
+        new URL(isAdmin ? "/admin/dashboard" : "/dashboard", request.url),
+      );
     }
-
-    // Otherwise allow access to public pages
     return NextResponse.next();
   }
 
   // 2) Protected routes: require refresh token
-  if (!refreshToken) {
-    // Safety: if already heading to login, don't redirect again
-    // (prevents any accidental loop if config changes later)
-    if (pathname === "/login") return NextResponse.next();
+  // if (!refreshToken) {
+  //   // Safety: if already heading to login, don't redirect again
+  //   // (prevents any accidental loop if config changes later)
+  //   if (pathname === "/login") return NextResponse.next();
 
+  //   const loginUrl = new URL("/login", request.url);
+  //   // loginUrl.searchParams.set("next", pathname + search);
+  //   return NextResponse.redirect(loginUrl);
+  // }
+
+  // 2) Protected routes require login
+  if (!isLoggedIn) {
     const loginUrl = new URL("/login", request.url);
-    // loginUrl.searchParams.set("next", pathname + search);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // 3) Admin area protection
+  if (pathname.startsWith("/admin")) {
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
+  // 4) Optional: prevent admin from entering learner area
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
   }
 
   return NextResponse.next();
@@ -61,7 +89,7 @@ export const config = {
   matcher: [
     "/", // root redirect
     "/login", // allow/redirect logic
-    "/first-login/:path*",
+    "/verify-email/:path*",
     "/register/:path*",
     "/forgot-password/:path*",
     "/reset-password/:path*",

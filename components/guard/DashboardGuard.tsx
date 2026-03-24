@@ -42,7 +42,11 @@ export default function DashboardGuard({
       return;
     }
 
-    if (data?.data?.user?.isFirstTimeLogin) {
+    if (
+      data?.data?.user?.isFirstTimeLogin &&
+      data?.data?.user.authScope !== "admin"
+    ) {
+      console.log("Moving to onboarding");
       router.replace("/onboarding");
       return;
     }

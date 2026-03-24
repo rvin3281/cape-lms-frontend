@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import LoginRedirection from "../loading/LoginRedirection";
@@ -32,30 +32,89 @@ import LoginFormInput from "./form/LoginFormInput";
 import LoginFormSelect from "./form/LoginFormSelect";
 import FormErrorDisplay from "./FormErrorDisplay";
 
+function getVerifyEmailHref(roleCode?: string) {
+  switch (roleCode) {
+    case "HYBRID_LEARNER":
+      return "/verify-email/hybrid";
+    case "CLASSROOM_LEARNER":
+      return "/verify-email/classroom";
+    default:
+      return null;
+  }
+}
+
+function getLoginButtonLabel(roleCode?: string, isPending?: boolean) {
+  if (isPending) return "Logging in...";
+
+  switch (roleCode) {
+    case "INDIVIDUAL_LEARNER":
+      return "Sign In as Individual Learner";
+    case "HYBRID_LEARNER":
+      return "Sign In as Hybrid Learner";
+    case "CLASSROOM_LEARNER":
+      return "Sign In as Classroom Learner";
+    default:
+      return "Sign In";
+  }
+}
+
+type PostSetPasswordRole = "hybrid" | "classroom";
+
+function getRoleCodeFromPostSetPasswordRole(
+  role?: PostSetPasswordRole | null,
+): TLoginSchema["roleCode"] | "" {
+  switch (role) {
+    case "hybrid":
+      return "HYBRID_LEARNER";
+    case "classroom":
+      return "CLASSROOM_LEARNER";
+    default:
+      return "";
+  }
+}
+
+function getValidatedBannerContent(role?: PostSetPasswordRole | null) {
+  switch (role) {
+    case "hybrid":
+      return {
+        title: "Your Hybrid Learner account is ready",
+        description: "Please sign in using your verified email and password.",
+      };
+    case "classroom":
+      return {
+        title: "Your Classroom Learner account is ready",
+        description:
+          "Please sign in using your verified classroom email and password.",
+      };
+    default:
+      return {
+        title: "Your learner account is ready",
+        description: "Please sign in using your email and password.",
+      };
+  }
+}
+
 function LoginComponent({
-  lockEnterpriseLearner,
+  lockLearnerType,
   prefillEmail,
   showValidatedBanner,
+  postSetPasswordRole,
 }: {
-  lockEnterpriseLearner?: boolean;
+  lockLearnerType?: boolean;
   prefillEmail?: string;
   showValidatedBanner?: boolean;
+  postSetPasswordRole?: PostSetPasswordRole | null;
 }) {
   const [error, setError] = useState<AxiosError<ApiErrorPayload> | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-
   const [redirecting, setRedirecting] = useState(false);
 
-  const [individualLearnerSelected, setIndividualLearnerSelected] =
-    useState(true);
-
   const router = useRouter();
-  // const dispatch = useAppDispatch();
 
   const form = useForm<TLoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      loginContext: "",
+      roleCode: "",
       email: "",
       password: "",
     },
@@ -70,24 +129,25 @@ function LoginComponent({
   const isDisabled =
     !isDirty || !isValid || isSubmitting || loginAdmin.isPending;
 
-  // ✅ watch field values
+  // watch field values
   const email = form.watch("email");
   const password = form.watch("password");
-  const loginContext = form.watch("loginContext");
+  const roleCode = form.watch("roleCode");
 
-  // useEffect(() => {
-  //   if (!prefillEmail) return;
+  const isIndividualLearner = roleCode === "INDIVIDUAL_LEARNER";
 
-  //   form.setValue("email", "test@gmail.com", { shouldDirty: true });
-  // }, [prefillEmail]);
+  const verifyEmailHref = useMemo(
+    () => getVerifyEmailHref(roleCode),
+    [roleCode],
+  );
 
   useEffect(() => {
     form.reset({
-      loginContext: lockEnterpriseLearner ? "ENTERPRISE_LEARNER" : "",
+      roleCode: getRoleCodeFromPostSetPasswordRole(postSetPasswordRole),
       email: prefillEmail ?? "",
       password: "",
     });
-  }, [lockEnterpriseLearner, prefillEmail]); // ✅ correct deps
+  }, [postSetPasswordRole, prefillEmail]);
 
   useEffect(() => {
     if (!formError) return;
@@ -95,22 +155,9 @@ function LoginComponent({
     setFormError(null);
   }, [email, password]);
 
-  useEffect(() => {
-    if (!loginContext) return;
-
-    if (loginContext === "INDIVIDUAL_LEARNER") {
-      setIndividualLearnerSelected(true);
-    }
-
-    if (loginContext === "ENTERPRISE_LEARNER") {
-      setIndividualLearnerSelected(false);
-    }
-  }, [loginContext]);
-
-  useEffect(() => {}, [lockEnterpriseLearner, prefillEmail]);
-  // Form Submission
   const onSubmit = async (values: TLoginSchema) => {
     setError(null);
+
     loginAdmin.mutate(values, {
       onSuccess: (data: any) => {
         setError(null);
@@ -121,22 +168,17 @@ function LoginComponent({
           return;
         }
 
-        // ✅ handle redirect with optional `next`
         const urlParams = new URLSearchParams(window.location.search);
         const next = urlParams.get("next") || "/dashboard";
 
         router.replace(next);
       },
       onError: (e) => {
-        console.log("Login error:", e);
         setRedirecting(false);
-
         const resolved = resolveFormError(e);
-
         setFormError(resolved.message);
 
         if (resolved.fieldErrors) {
-          // field-level (RHF)
           Object.entries(resolved.fieldErrors).forEach(([field, message]) => {
             form.setError(field as any, { type: "server", message });
           });
@@ -147,7 +189,6 @@ function LoginComponent({
       },
     });
   };
-
   return (
     <>
       {redirecting && (
@@ -160,10 +201,10 @@ function LoginComponent({
           <Card className="border border-emerald-200 bg-emerald-50/60 p-3 text-emerald-900 rounded-xl py-3 my-3">
             <CardContent className="flex flex-col">
               <p className="font-semibold mb-1 text-sm">
-                Your Enterprise Learner account has been validated
+                {getValidatedBannerContent(postSetPasswordRole).title}
               </p>
               <p className="text-sm">
-                Please log in using your email and password.
+                {getValidatedBannerContent(postSetPasswordRole).description}
               </p>
             </CardContent>
           </Card>
@@ -201,19 +242,19 @@ function LoginComponent({
                 <FieldGroup className="gap-4">
                   {/* Role / Login Context */}
                   <Controller
-                    name="loginContext"
+                    name="roleCode"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel
-                          htmlFor="login-context"
+                          htmlFor="role-code"
                           className="text-[16px] font-medium text-slate-700"
                         >
                           Learner Type
                         </FieldLabel>
 
                         <LoginFormSelect
-                          id="login-context"
+                          id="role-code"
                           placeholder="Select learner type"
                           options={[
                             {
@@ -221,18 +262,22 @@ function LoginComponent({
                               label: "Individual Learner",
                             },
                             {
-                              value: "ENTERPRISE_LEARNER",
-                              label: "Enterprise Learner",
+                              value: "HYBRID_LEARNER",
+                              label: "Hybrid Learner",
+                            },
+                            {
+                              value: "CLASSROOM_LEARNER",
+                              label: "Classroom Learner",
                             },
                           ]}
                           // field={field}
-                          value={field.value} // ✅ pass value explicitly
-                          onValueChange={field.onChange} // ✅ pass change handler explicitly
+                          value={field.value}
+                          onValueChange={field.onChange}
                           ariaInvalid={fieldState.invalid}
                           disabled={
                             loginAdmin.isPending ||
                             redirecting ||
-                            lockEnterpriseLearner
+                            lockLearnerType
                           }
                         />
 
@@ -305,17 +350,17 @@ function LoginComponent({
 
             {/* Remeber me and Forgot Password */}
             <div className="flex items-end justify-between mt-3">
-              {!individualLearnerSelected && (
+              {verifyEmailHref && (
                 <Link
-                  className="text-bluetext-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
-                  href="/first-login"
+                  className="text-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+                  href={verifyEmailHref}
                 >
-                  First Time Login?
+                  Verify Email
                 </Link>
               )}
 
               <Link
-                className="text-bluetext-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                 href="#"
               >
                 Forgot Password?
@@ -325,15 +370,7 @@ function LoginComponent({
             {/* Submit Button */}
             <div className="flex mt-6">
               <LoginFormButton
-                btnName={
-                  loginAdmin.isPending
-                    ? "Logging in..."
-                    : `${
-                        individualLearnerSelected
-                          ? "Sign In As Learner"
-                          : "Sign In As Enterprise Learner"
-                      }`
-                }
+                btnName={getLoginButtonLabel(roleCode, loginAdmin.isPending)}
                 variant="primary"
                 type="submit"
                 disabled={isDisabled}
@@ -349,7 +386,7 @@ function LoginComponent({
         {/* ========================= */}
         {/* OAuth SEPARATOR (OR)      */}
         {/* ========================= */}
-        {individualLearnerSelected && (
+        {isIndividualLearner && (
           <>
             <div className="flex items-center gap-4 my-4">
               <div className="flex-1 h-px bg-slate-200" />
@@ -359,9 +396,6 @@ function LoginComponent({
               <div className="flex-1 h-px bg-slate-200" />
             </div>
 
-            {/* ========================= */}
-            {/* OAuth BUTTONS (OUTSIDE FORM) */}
-            {/* ========================= */}
             <div className="flex flex-col gap-3">
               <Button variant="outline" size="lg">
                 <FaGoogle /> Continue with Google
@@ -371,23 +405,10 @@ function LoginComponent({
               </Button>
             </div>
 
-            {/* ========================= */}
-            {/* SIGN UP LINK              */}
-            {/* ========================= */}
-            {/* subtle helper text */}
-            <p className="mt-3 text-center  text-slate-500">
+            <p className="mt-3 text-center text-slate-500">
               Don&apos;t have an account?{" "}
               <Link
-                className="text-bluetext-sm
-      text-blue-600
-      hover:text-blue-700
-      hover:underline
-      underline-offset-4
-      transition-colors
-      focus:outline-none
-      focus-visible:ring-2
-      focus-visible:ring-blue-500
-      rounded-sm"
+                className="text-sm text-blue-600 hover:text-blue-700 hover:underline underline-offset-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                 href="#"
               >
                 Sign up Free

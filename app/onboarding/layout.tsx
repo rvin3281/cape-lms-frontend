@@ -1,5 +1,5 @@
 import OnboardingHeader from "@/components/onboarding/OnboardingHeader";
-import OnBoardingGuard from "../(dashboard)/guard/OnBoardingGuard";
+import OnBoardingGuard from "../../components/guard/OnBoardingGuard";
 
 function OnBoardingLayout({
   children,
