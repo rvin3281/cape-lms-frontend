@@ -7,7 +7,7 @@ import { selectAuthUser } from "@/lib/redux/feature/auth/authSelectors";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { formatUserName } from "@/utils/formatUserName";
 
-function DashboardClient() {
+function DashboardHomeHybrid() {
   const user = useAppSelector(selectAuthUser);
 
   return (
@@ -54,4 +54,4 @@ function DashboardClient() {
     </>
   );
 }
-export default DashboardClient;
+export default DashboardHomeHybrid;

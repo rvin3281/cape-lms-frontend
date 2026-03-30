@@ -59,7 +59,8 @@ export default function DashboardGuard({
           email: data?.data?.user.email,
           roleName: data?.data?.user.roleName,
           roleId: data?.data?.user.roleId,
-          role: data?.data?.user.role,
+          roleCode: data?.data?.user.roleCode,
+          authScope: data?.data?.user.authScope,
         }),
       );
     }

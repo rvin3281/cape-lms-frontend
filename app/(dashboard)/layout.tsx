@@ -7,10 +7,6 @@ import DashboardGuard from "../../components/guard/DashboardGuard";
 async function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  // const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-  // await new Promise((res) => setTimeout(res, 3000));
-
   return (
     <DashboardGuard>
       <SidebarProvider defaultOpen={true}>
@@ -20,7 +16,7 @@ async function DashboardLayout({
 
           {/* MAIN-LAYOUT */}
           <main className="w-full min-h-screen ">
-            <div className="w-full 2xl:max-w-[1400px] 2xl:mx-auto px-4s">
+            <div className="w-full 2xl:max-w-[1400px] 2xl:mx-auto px-4">
               {/* NAVBAR */}
               {/* <Navbar /> */}
 

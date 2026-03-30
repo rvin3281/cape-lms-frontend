@@ -6,7 +6,8 @@ export type AuthUser = {
   email: string;
   roleName: string;
   roleId: string;
-  role?: string;
+  roleCode: string;
+  authScope: string;
 };
 
 type AuthState = {

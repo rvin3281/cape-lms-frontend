@@ -14,6 +14,7 @@ async function userLogin(
   const response = await axiosInstance.post(LOGIN_API, data, {
     _skipRefresh: true,
   } as any);
+  console.log("Login response:", response);
   return response.data;
 }
 
@@ -24,7 +25,6 @@ export const useLogin = () => {
     mutationFn: userLogin,
     mutationKey: ["user", "login"],
     onSuccess: async (_data) => {
-      // ✅ tells app "auth state changed"
       await qc.invalidateQueries({ queryKey: ["auth", "me"] });
     },
     onError: (_error: any) => {

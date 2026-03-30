@@ -78,7 +78,7 @@ function AppSidebarAdmin() {
   return (
     <Sidebar collapsible="icon" className="w-64">
       {/* Sidebar Header */}
-      <AppSidebarHeader />
+      <AppSidebarHeader title="CAPE Admin Dashboard" />
 
       {/* Sidebar Content */}
       <SidebarContent>

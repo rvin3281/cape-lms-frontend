@@ -137,8 +137,6 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
     const resolvedEmail = response?.data?.email ?? form.getValues("email");
     const resolvedToken = response?.data?.token;
 
-    console.log("SUCCESS RESPONSE", response);
-
     router.push(
       `${content.setPasswordBasePath}?email=${encodeURIComponent(
         resolvedEmail,
@@ -159,6 +157,8 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
   const handleMutationError = (error: any) => {
     setRedirecting(false);
 
+    console.log("error", error.response);
+
     const resolved = resolveFormError(error);
 
     if (resolved.rawCode === "USER_EXIST_ACTIVE") {
@@ -166,19 +166,20 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
       return;
     }
 
-    if (resolved.rawCode === "USER_NOT_FOUND") {
-      setFormError(resolved.message);
-      toast.error(content.validateErrorToast);
-      return;
-    }
-
-    if (resolved.rawCode === "INVALID_USER_ROLE") {
-      setFormError(resolved.message);
-      toast.error(content.validateErrorToast);
-      return;
-    }
-
-    if (resolved.rawCode === "USER_ACCOUNT_INACTIVE") {
+    if (
+      resolved.rawCode === "USER_NOT_FOUND" ||
+      resolved.rawCode === "INVALID_USER_ROLE" ||
+      resolved.rawCode === "USER_ACCOUNT_INACTIVE" ||
+      resolved.rawCode === "INVALID_USER_ROLE_HYBRID" ||
+      resolved.rawCode === "NO_PROGRAM_ENROLLED_HYBRID" ||
+      resolved.rawCode === "USER_EXIST_ACTIVE" ||
+      resolved.rawCode === "LW_USER_EXIST_COMPLETED_ONBOARDING" ||
+      resolved.rawCode === "LW_FAILED_FETCH_USER_DATA" ||
+      resolved.rawCode === "LW_SERVICE_UNAVAILABLE" ||
+      resolved.rawCode === "LW_USER_SUSPENDED" ||
+      resolved.rawCode === "LW_USER_SUSPENDED" ||
+      resolved.rawCode === "LW_USER_NOT_ELIGIBLE"
+    ) {
       setFormError(resolved.message);
       toast.error(content.validateErrorToast);
       return;

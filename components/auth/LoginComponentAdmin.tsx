@@ -147,12 +147,13 @@ function LoginComponentAdmin() {
                           placeholder="Select Admin type"
                           options={[
                             {
-                              value: "HR_FOCAL_ADMIN",
-                              label: "HR Focal Admin",
-                            },
-                            {
                               value: "CAPE_ADMIN",
                               label: "CAPE Admin ",
+                            },
+                            {
+                              value: "HR_FOCAL_ADMIN",
+                              label: "HR Focal Admin",
+                              disabled: true,
                             },
                           ]}
                           field={field}

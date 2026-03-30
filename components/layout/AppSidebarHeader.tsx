@@ -9,7 +9,7 @@ import {
   useSidebar,
 } from "../ui/sidebar";
 
-function AppSidebarHeader() {
+function AppSidebarHeader({ title }: { title: string }) {
   const { open } = useSidebar();
 
   return (
@@ -29,7 +29,7 @@ function AppSidebarHeader() {
                 alt="CAPE Dashboard"
                 className=" shrink-0 h-13 w-13"
               />
-              <span className="text-base font-semibold">CAPE Admin LMS</span>
+              <span className="text-base font-semibold">{title}</span>
             </a>
           </SidebarMenuButton>
         </SidebarMenuItem>

@@ -23,70 +23,42 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "../ui/sidebar";
+import { useAppLogout } from "@/hooks/useAppLogout";
+import AppProcessingOverlay from "../loading/AppProcessingOverlay";
 
 function NavUser() {
   const { isMobile, open } = useSidebar();
 
   const user = useAppSelector(selectAuthUser);
-  const logOutQuery = useLogout();
-  const dispatch = useAppDispatch();
+  const { logout, isLoggingOut } = useAppLogout();
 
   const initials = user?.email?.slice(0, 2)?.toUpperCase() ?? "NA";
 
-  const logoutBtn = () => {
-    logOutQuery.mutate(undefined, {
-      onSuccess: () => {
-        dispatch(clearAuth());
-      },
-      onError: () => {
-        // optional: still clear locally if you want immediate UI update
-        dispatch(clearAuth());
-      },
-    });
-  };
-
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar
-                className={`${!open ? "h-8 w-8" : "h-10 w-10"} rounded-3xl`}
+    <>
+      <AppProcessingOverlay
+        open={isLoggingOut}
+        title="Signing you out"
+        description="Please wait while we end your session securely..."
+      />
+
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
-                <AvatarFallback
-                  className={`rounded-3xl ${
-                    !open ? "text-[14px]" : "text-[16px]"
-                  }  bg-primary text-white`}
+                <Avatar
+                  className={`${!open ? "h-8 w-8" : "h-10 w-10"} rounded-3xl`}
                 >
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{`${formatUserName(
-                  user?.name,
-                )}`}</span>
-                <span className="truncate text-xs">{user?.roleName}</span>
-                <span className="truncate text-xs">{user?.email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-10 w-10 rounded-3xl">
-                  {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                  <AvatarFallback className="rounded-3xl text-[16px] bg-primary text-white">
+                  {/* <AvatarImage src={user?.avatar} alt={user?.name} /> */}
+                  <AvatarFallback
+                    className={`rounded-3xl ${
+                      !open ? "text-[14px]" : "text-[16px]"
+                    }  bg-primary text-white`}
+                  >
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -97,11 +69,35 @@ function NavUser() {
                   <span className="truncate text-xs">{user?.roleName}</span>
                   <span className="truncate text-xs">{user?.email}</span>
                 </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+                <ChevronsUpDown className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-10 w-10 rounded-3xl">
+                    {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
+                    <AvatarFallback className="rounded-3xl text-[16px] bg-primary text-white">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{`${formatUserName(
+                      user?.name,
+                    )}`}</span>
+                    <span className="truncate text-xs">{user?.roleName}</span>
+                    <span className="truncate text-xs">{user?.email}</span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
 
-            {/* <DropdownMenuSeparator />
+              {/* <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
@@ -114,14 +110,15 @@ function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator /> */}
-            <DropdownMenuItem onClick={logoutBtn}>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+              <DropdownMenuItem onClick={logout}>
+                <LogOut />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </>
   );
 }
 export default NavUser;

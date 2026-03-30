@@ -85,7 +85,10 @@ export const ServerFormError = (errorCode?: string): string => {
       return "Facilitator Name Already Exist. Please try again!";
 
     case "INVALID_USER_ROLE":
-      return "This email is not registered as a classroom learner account.";
+      return "This account is not allowed to continue with classroom learner onboarding. Please use the correct learner account or contact support.";
+
+    case "INVALID_USER_ROLE_HYBRID":
+      return "This account is not allowed to continue with hybrid learner onboarding. Please use the correct learner account or contact support.";
 
     case "USER_ACCOUNT_INACTIVE":
       return "This account is inactive. Please contact administrator.";
@@ -104,6 +107,27 @@ export const ServerFormError = (errorCode?: string): string => {
 
     case "SET_PASSWORD_LINK_INVALID":
       return "We could not verify your password setup link. Please request a new one.";
+
+    case "NO_PROGRAM_ENROLLED_HYBRID":
+      return "We could not find any enrolled program linked to this email. Please check your email or contact support.";
+
+    case "LW_USER_EXIST_COMPLETED_ONBOARDING":
+      return "Your account setup has already been completed. Please sign in using your password.";
+
+    case "LW_FAILED_FETCH_USER_DATA":
+      return "We were unable to verify your account details at the moment. Please try again shortly.";
+
+    case "LW_SERVICE_UNAVAILABLE":
+      return "The learning platform is temporarily unavailable. Please try again in a few minutes.";
+
+    case "LW_USER_SUSPENDED":
+      return "Your learning account is currently suspended. Please contact support for assistance.";
+
+    case "LW_USER_ADMIN_INSTRUCTOR":
+      return "Your learning account is currently suspended. Please contact support for assistance.";
+
+    case "LW_USER_NOT_ELIGIBLE":
+      return "This email is not eligible to continue onboarding. Please check your account or contact support.";
 
     default:
       return "Something went wrong on our side. Please try again later or contact our support team for assistance.";

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { REFRESH_API } from "@/lib/constant/api-url";
+import { LOGOUT_API, REFRESH_API } from "@/lib/constant/api-url";
 import { SET_PASSWORD_TOKEN_NOT_EXIST } from "@/lib/constant/error-code";
 import { ApiErrorPayload } from "@/lib/interface/APIErrorResponse";
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
@@ -16,16 +15,65 @@ const refreshClient = axios.create({
   withCredentials: true,
 });
 
+const logoutClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
+
 type RetryConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
   _skipRefresh?: boolean;
+  _skipAuthRedirect?: boolean;
 };
 
 let isRefreshing = false;
 let refreshPromise: Promise<void> | null = null;
 
+async function forceCleanupAndRedirect() {
+  try {
+    console.log("Logging out due to authentication failure...");
+    await logoutClient.post(LOGOUT_API, null, {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch {
+    // ignore, backend may already reject token
+  }
+
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {}
+
+    if (window.location.pathname !== "/login") {
+      window.location.replace("/login");
+    }
+  }
+}
+
 async function refreshAccessToken(): Promise<void> {
   await refreshClient.post(REFRESH_API);
+}
+
+function isAuthRoute(url: string) {
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/refresh") ||
+    url.includes("/auth/logout")
+  );
+}
+
+function isLoginRoute(url: string) {
+  return url.includes("/auth/login");
+}
+
+function isRefreshRoute(url: string) {
+  return url.includes("/auth/refresh");
+}
+
+function isLogoutRoute(url: string) {
+  return url.includes("/auth/logout");
 }
 
 axiosInstance.interceptors.response.use(
@@ -48,21 +96,33 @@ axiosInstance.interceptors.response.use(
     if (status !== 401 || errorCode === SET_PASSWORD_TOKEN_NOT_EXIST)
       throw error;
 
-    if (
-      url.includes("/auth/login") ||
-      url.includes("/auth/refresh") ||
-      url.includes("/auth/logout") ||
-      original._skipRefresh // manual override
-    ) {
-      throw error; // pass 401 back to React Query / UI
+    if (isLoginRoute(url)) {
+      throw error;
     }
 
-    if (original._retry) throw error;
+    if (original._skipRefresh || original._skipAuthRedirect) {
+      throw error;
+    }
+
+    if (isRefreshRoute(url) || isLogoutRoute(url)) {
+      await forceCleanupAndRedirect();
+      throw error;
+    }
+
+    if (original._retry) {
+      await forceCleanupAndRedirect();
+      throw error;
+    }
     original._retry = true;
 
     if (isRefreshing) {
-      if (refreshPromise) await refreshPromise;
-      return axiosInstance(original);
+      try {
+        if (refreshPromise) await refreshPromise;
+        return axiosInstance(original);
+      } catch {
+        await forceCleanupAndRedirect();
+        throw error;
+      }
     }
 
     isRefreshing = true;
@@ -70,7 +130,6 @@ axiosInstance.interceptors.response.use(
       try {
         await refreshAccessToken();
       } finally {
-        // reset lock even if refresh fails
         isRefreshing = false;
         refreshPromise = null;
       }
@@ -79,8 +138,8 @@ axiosInstance.interceptors.response.use(
     try {
       await refreshPromise;
       return axiosInstance(original);
-    } catch (error: any) {
-      if (typeof window !== "undefined") window.location.href = "/login";
+    } catch {
+      await forceCleanupAndRedirect();
       throw error;
     }
   },

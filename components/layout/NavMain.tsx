@@ -19,10 +19,10 @@ export type NavSubItem = {
 
 export type NavItem = {
   title: string;
-  url?: string; // ✅ optional for parent groups
+  url?: string;
   icon?: ComponentType<{ className?: string }>;
   isActive?: boolean;
-  items?: NavSubItem[]; // ✅ optional
+  items?: NavSubItem[];
 };
 
 export function isExactActive(pathname: string, url?: string) {

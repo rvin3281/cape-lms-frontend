@@ -210,19 +210,28 @@ function LoginComponent({
           </Card>
         ) : (
           <Card className="border border-blue-200 bg-blue-50/60 rounded-xl py-3 my-3">
-            <CardContent className="flex flex-col gap-1">
+            <CardContent className="flex flex-col gap-2">
               <p className="text-blue-900 text-sm leading-relaxed">
-                <span className="font-semibold">Learner Access:</span> Access
-                your courses, track progress, join community discussions, and
-                earn achievements.
+                Choose the learner type that matches how your account was
+                created and how you access training on CAPE.
               </p>
+
               <p className="text-blue-900 text-sm leading-relaxed">
-                <span className="font-semibold">Individual Learner -</span> Sign
-                up and learn on your own.
+                <span className="font-semibold">Individual Learner -</span> For
+                users who sign up on their own to explore, purchase, and join
+                available courses or programmes.
               </p>
+
               <p className="text-blue-900 text-sm leading-relaxed">
-                <span className="font-semibold">Enterprise Learner -</span>{" "}
-                Access training provided by your company (account pre-created).
+                <span className="font-semibold">Hybrid Learner -</span> For
+                employees or sponsored learners whose account was created for
+                company or organisation training access.
+              </p>
+
+              <p className="text-blue-900 text-sm leading-relaxed">
+                <span className="font-semibold">Classroom Learner -</span> For
+                learners attending physical or in-person training sessions
+                conducted by CAPE.
               </p>
             </CardContent>
           </Card>
@@ -260,6 +269,7 @@ function LoginComponent({
                             {
                               value: "INDIVIDUAL_LEARNER",
                               label: "Individual Learner",
+                              disabled: true,
                             },
                             {
                               value: "HYBRID_LEARNER",
