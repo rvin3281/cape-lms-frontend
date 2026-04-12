@@ -1,6 +1,5 @@
 import FirstTimeLoginComponent from "@/components/auth/FirstTimeLoginComponent";
 import LoginHeader from "@/components/auth/LoginHeader";
-import { Suspense } from "react";
 import LoginFormContainer from "../../../../components/auth/LoginFormContainer";
 import { notFound } from "next/navigation";
 
@@ -55,9 +54,9 @@ async function FirstLoginPage({ params }: FirstLoginPageProps) {
           />
         </div>
 
-        <Suspense fallback={<div className="mt-4">Loading...</div>}>
-          <FirstTimeLoginComponent role={role} />
-        </Suspense>
+        {/* <Suspense fallback={<div className="mt-4">Loading...</div>}> */}
+        <FirstTimeLoginComponent role={role} />
+        {/* </Suspense> */}
       </div>
     </LoginFormContainer>
   );

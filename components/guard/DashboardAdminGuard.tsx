@@ -66,6 +66,8 @@ export default function DashboardAdminGuard({
           email: data?.data?.user.email,
           roleName: data?.data?.user.roleName,
           roleId: data?.data?.user.roleId,
+          roleCode: data?.data?.user.roleCode,
+          authScope: data?.data?.user.authScope,
           role: data?.data?.user.role,
         }),
       );

@@ -4,8 +4,6 @@ import axiosInstance from "@/utils/axiosInstance";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const uploadProgramOnboarding = async (data: TProgramOnboardingSchema) => {
-  console.log("DATA", data);
-
   const formData = new FormData();
 
   formData.append("programName", data.programName);
@@ -31,6 +29,9 @@ export const useUploadProgramOnboarding = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["program-onboarding"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["cape-users"],
       });
     },
     onError: () => {},

@@ -3,12 +3,13 @@
 
 import { useGetAllProgramOnboarding } from "@/app/queries/useGetAllProgramOnboarding";
 import { PaginationState, SortingState } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getProgramOnboardingColumns } from "./program-onboarding-column";
 import { DataTable } from "@/components/data-table/data-table";
 import DeleteDialog from "@/components/alert/DeleteDialog";
 import { useDeleteProgramOnboarding } from "@/app/queries/useDeleteProgramOnboarding";
 import { toast } from "sonner";
+import UpdateClassroomProgram from "@/components/drawer/UpdateClassroomProgram";
 
 export default function ProgramOnboardingTable() {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -19,6 +20,9 @@ export default function ProgramOnboardingTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedProgramOnboarding, setSelectedProgramOnboarding] =
     useState<any>(null);
+  const [showError, setShowError] = useState(false);
+
+  const [updateDrawerOpen, setUpdateDrawerOpen] = useState(false);
 
   const page = pagination.pageIndex + 1;
   const pageSize = pagination.pageSize;
@@ -29,6 +33,8 @@ export default function ProgramOnboardingTable() {
     pageSize,
     search,
   });
+
+  console.log("DATA", data);
 
   const deleteProgramOnboardingApi = useDeleteProgramOnboarding();
 
@@ -58,14 +64,29 @@ export default function ProgramOnboardingTable() {
     });
   };
 
+  const handleOpenUpdateDrawer = useCallback((programOnboarding: any) => {
+    setSelectedProgramOnboarding(programOnboarding);
+    setUpdateDrawerOpen(true);
+  }, []);
+
+  const handleCloseUpdateDrawer = useCallback((open: boolean) => {
+    setUpdateDrawerOpen(open);
+    if (!open) {
+      setTimeout(() => {
+        setSelectedProgramOnboarding(null);
+      }, 300);
+    }
+  }, []);
+
   const columns = useMemo(
     () =>
       getProgramOnboardingColumns({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
+        onUpdate: handleOpenUpdateDrawer,
         onDelete: handleOpenDeleteDialog,
       }),
-    [pagination.pageIndex, pagination.pageSize],
+    [handleOpenUpdateDrawer, pagination.pageIndex, pagination.pageSize],
   );
 
   if (isPending) {
@@ -94,6 +115,14 @@ export default function ProgramOnboardingTable() {
         onPaginationChange={setPagination}
         sorting={sorting}
         onSortingChange={setSorting}
+      />
+
+      <UpdateClassroomProgram
+        open={updateDrawerOpen}
+        onOpenChange={handleCloseUpdateDrawer}
+        classroomProgram={selectedProgramOnboarding}
+        showError={showError}
+        setShowError={setShowError}
       />
 
       <DeleteDialog

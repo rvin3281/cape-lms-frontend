@@ -1,15 +1,12 @@
 import DashboardAdminGuard from "@/components/guard/DashboardAdminGuard";
 import AppSidebarAdmin from "@/components/layout/AppSidebarAdmin";
-import DashboardGuardLoading from "@/components/loading/DashboardGuardLoading";
 import Loader from "@/components/loading/Loader";
 import { Separator } from "@/components/ui/separator";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { cookies } from "next/headers";
 
 async function DashboardLayoutAdmin({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
   // const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   // await new Promise((res) => setTimeout(res, 3000));
 

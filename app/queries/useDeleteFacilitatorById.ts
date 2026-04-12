@@ -1,6 +1,6 @@
 import { FACILITITATOR } from "@/lib/constant/api-url";
 import axiosInstance from "@/utils/axiosInstance";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const deleteFacilitatorById = async (id: string) => {

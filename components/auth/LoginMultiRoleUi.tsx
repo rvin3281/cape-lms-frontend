@@ -1,12 +1,11 @@
 "use client";
 
 import LoginFormContainer from "@/components/auth/LoginFormContainer";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import LoginComponent from "./LoginComponent";
 import LoginComponentAdmin from "./LoginComponentAdmin";
 import LoginHeader from "./LoginHeader";
-import { Card, CardContent } from "../ui/card";
 
 type PostSetPasswordRole = "hybrid" | "classroom";
 
@@ -22,24 +21,24 @@ function isValidPostSetPasswordRole(
   return value === "hybrid" || value === "classroom";
 }
 
-const POST_SET_PASSWORD_CONTENT: Record<
-  PostSetPasswordRole,
-  {
-    title: string;
-    description: string;
-  }
-> = {
-  hybrid: {
-    title: "Password created successfully",
-    description:
-      "Your hybrid learner account is ready. Please sign in using your verified email and password.",
-  },
-  classroom: {
-    title: "Password created successfully",
-    description:
-      "Your classroom learner account is ready. Please sign in using your verified classroom email and password.",
-  },
-};
+// const POST_SET_PASSWORD_CONTENT: Record<
+//   PostSetPasswordRole,
+//   {
+//     title: string;
+//     description: string;
+//   }
+// > = {
+//   hybrid: {
+//     title: "Password created successfully",
+//     description:
+//       "Your hybrid learner account is ready. Please sign in using your verified email and password.",
+//   },
+//   classroom: {
+//     title: "Password created successfully",
+//     description:
+//       "Your classroom learner account is ready. Please sign in using your verified classroom email and password.",
+//   },
+// };
 
 function LoginMultiRoleUi() {
   const [lockToLearner, setLockToLearner] = useState(false);
@@ -74,11 +73,6 @@ function LoginMultiRoleUi() {
       sessionStorage.removeItem("post_set_password");
     }
   }, []);
-
-  const successContent = useMemo(() => {
-    if (!postSetPasswordRole) return null;
-    return POST_SET_PASSWORD_CONTENT[postSetPasswordRole];
-  }, [postSetPasswordRole]);
 
   return (
     <LoginFormContainer>

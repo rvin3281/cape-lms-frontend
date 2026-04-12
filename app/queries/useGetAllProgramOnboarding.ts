@@ -21,6 +21,7 @@ const getAllProgramOnboarding = async (params: ProgramOnboardingListParams) => {
       search: params.search ?? "",
     },
   });
+
   return res.data;
 };
 

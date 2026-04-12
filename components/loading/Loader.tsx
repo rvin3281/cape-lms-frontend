@@ -2,7 +2,7 @@
 
 import { selectDashboardLoader } from "@/lib/redux/feature/dashboardLoader/dashboardLoaderSelector";
 import { useAppSelector } from "@/lib/redux/hooks";
-import { Bars, TailSpin } from "react-loader-spinner";
+import { Bars } from "react-loader-spinner";
 
 function Loader() {
   const isLoading = useAppSelector(selectDashboardLoader);

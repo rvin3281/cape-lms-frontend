@@ -1,9 +1,7 @@
 "use client";
-import { Award, BookOpen, Brain, UserRound } from "lucide-react";
-import { FaHome } from "react-icons/fa";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import AppSidebarHeader from "./AppSidebarHeader";
-import NavMain, { NavItem } from "./NavMain";
+import NavMain from "./NavMain";
 import NavUser from "./NavUser";
 import { useMe } from "@/app/queries/useMe";
 import { LEARNER_SIDEBAR_CONFIG_BY_ROLE } from "@/utils/learner-sidebar-config";

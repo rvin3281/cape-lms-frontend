@@ -14,7 +14,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import LoginRedirection from "../loading/LoginRedirection";
 import { Card, CardContent } from "../ui/card";
 import {
   Field,
@@ -52,7 +51,7 @@ function LoginComponentAdmin() {
   const { isDirty, isValid, isSubmitting } = form.formState;
 
   const isDisabled =
-    !isDirty || !isValid || isSubmitting || loginAdmin.isPending;
+    !isDirty || !isValid || isSubmitting || loginAdmin.isPending || redirecting;
 
   const email = form.watch("email");
   const password = form.watch("password");
@@ -62,7 +61,7 @@ function LoginComponentAdmin() {
     if (!formError) return;
 
     setFormError(null);
-  }, [email, password, roleCode]);
+  }, [email, formError, password, roleCode]);
 
   useEffect(() => {
     if (!error) return;
@@ -85,10 +84,11 @@ function LoginComponentAdmin() {
         setError(null);
         setRedirecting(true);
 
-        router.replace("/admin/dashboard");
+        setTimeout(() => {
+          router.replace("/admin/dashboard");
+        }, 300);
       },
       onError: (e) => {
-        console.log("Error", e);
         setRedirecting(false);
         const resolved = resolveFormError(e);
         setFormError(resolved.message);
@@ -108,7 +108,6 @@ function LoginComponentAdmin() {
 
   return (
     <>
-      {redirecting && <LoginRedirection title="Redirecting" />}
       {error && <ErrorLogin error={error} />}
 
       <div className="flex flex-col gap-4">
@@ -258,6 +257,8 @@ function LoginComponentAdmin() {
                 variant="primary"
                 type="submit"
                 disabled={isDisabled}
+                isLoading={loginAdmin.isPending || redirecting}
+                loadingText="Signing in..."
                 classname={cn(
                   "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
                   isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",

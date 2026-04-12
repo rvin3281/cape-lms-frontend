@@ -13,17 +13,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 
 type ProgramOnboardingColumnsProps = {
   pageIndex: number;
   pageSize: number;
+  onUpdate: (programOnboarding: any) => void;
   onDelete: (programOnboarding: any) => void;
 };
 
 export const getProgramOnboardingColumns = ({
   pageIndex,
   pageSize,
+  onUpdate,
   onDelete,
 }: ProgramOnboardingColumnsProps): ColumnDef<any>[] => [
   {
@@ -116,31 +117,31 @@ export const getProgramOnboardingColumns = ({
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    id: "viewDetails",
+  // {
+  //   id: "viewDetails",
 
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="View Details" />
-    ),
-    size: 120,
-    minSize: 80,
-    maxSize: 80,
-    cell: ({ row }) => {
-      const programOnboarding = row.original;
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="View Details" />
+  //   ),
+  //   size: 120,
+  //   minSize: 80,
+  //   maxSize: 80,
+  //   cell: ({ row }) => {
+  //     const programOnboarding = row.original;
 
-      return (
-        <Link
-          href={`/admin/program-onboarding/${programOnboarding.programName}`}
-        >
-          <span className="font-medium font-semibold leading-5 whitespace-normal break-words">
-            View Details
-          </span>
-        </Link>
-      );
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
+  //     return (
+  //       <Link
+  //         href={`/admin/program-onboarding/${programOnboarding.programName}`}
+  //       >
+  //         <span className="font-medium font-semibold leading-5 whitespace-normal break-words">
+  //           View Details
+  //         </span>
+  //       </Link>
+  //     );
+  //   },
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     id: "actions",
     header: "Action",
@@ -162,7 +163,8 @@ export const getProgramOnboardingColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => console.log("click updated")}>
+
+            <DropdownMenuItem onClick={() => onUpdate(programOnboarding)}>
               Update
             </DropdownMenuItem>
             <DropdownMenuItem

@@ -1,7 +1,6 @@
 import AppSidebar from "@/components/layout/AppSidebar";
 import { Separator } from "@/components/ui/separator";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { cookies } from "next/headers";
 import DashboardGuard from "../../components/guard/DashboardGuard";
 
 async function DashboardLayout({

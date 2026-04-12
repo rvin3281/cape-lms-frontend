@@ -7,8 +7,9 @@ export interface ILoginFormButton {
   btnName: string;
   variant?: "primary" | "secondary" | "outline";
   isLoading?: boolean;
-  disabled?: boolean; // ✅ optional
+  disabled?: boolean;
   classname?: string;
+  loadingText?: string;
 }
 
 function LoginFormButton({
@@ -18,8 +19,9 @@ function LoginFormButton({
   isLoading = false,
   disabled = false,
   classname,
+  loadingText = "Signing in...",
 }: ILoginFormButton) {
-  const isButtonDisabled = disabled || isLoading; // ✅ single source
+  const isButtonDisabled = disabled || isLoading;
 
   // Base Style
   const baseStyles = `
@@ -81,11 +83,15 @@ function LoginFormButton({
       type={type}
       disabled={isButtonDisabled}
       className={cn(baseStyles, variantStyles[variant], classname)}
+      aria-busy={isLoading}
     >
       {isLoading && (
-        <FiLoader className="h-4 w-4 animate-spin" aria-hidden="true" />
+        <FiLoader
+          className="h-4 w-4 animate-spin shrink-0"
+          aria-hidden="true"
+        />
       )}
-      <span>{isLoading ? "Please wait..." : btnName}</span>
+      <span>{isLoading ? loadingText : btnName}</span>
     </Button>
   );
 }

@@ -1,38 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import DashboardContentSkeleton from "@/components/layout/DashboardContentSkeleton";
 import { getDashboardHomeByRole } from "@/utils/get-dashboard-home";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import DashboardRedirectClient from "@/components/layout/DashboardRedirectClient";
+import { useMe } from "@/app/queries/useMe";
 
-async function getMeOnServer(): Promise<any | null> {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+export default function DashboardEntryPage() {
+  const router = useRouter();
+  const { data, isPending, isError } = useMe();
 
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-      method: "GET",
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: "no-store",
-    });
+  const user = data?.data?.user ?? null;
 
-    if (res.status === 401) return null;
+  useEffect(() => {
+    if (isPending) return;
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch /auth/me: ${res.status}`);
+    if (isError || !user) {
+      router.replace("/login?next=/dashboard");
+      return;
     }
 
-    return res.json();
-  } catch (error) {
-    console.error("Dashboard getMeOnServer error:", error);
-    throw error;
-  }
-}
+    if (user.isFirstTimeLogin && user.authScope !== "admin") {
+      router.replace("/onboarding");
+      return;
+    }
 
-export default async function DashboardEntryPage() {
-  const me = await getMeOnServer();
-  const user = me?.data?.user ?? null;
+    router.replace(getDashboardHomeByRole(user.roleCode));
+  }, [isPending, isError, user, router]);
 
-  return <DashboardRedirectClient user={user} />;
+  return <DashboardContentSkeleton />;
 }

@@ -250,3 +250,156 @@ export const FacilatorSchema = z.object({
 });
 
 export type TFacilatorSchema = z.infer<typeof FacilatorSchema>;
+
+/** ============================================ UPDATE CAPE USER ================================= */
+
+export const UpdateCapeUserSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, "First name is required")
+    .max(100, "First name must be less than 100 characters"),
+
+  lastName: z
+    .string()
+    .trim()
+    .min(1, "Last name is required")
+    .max(100, "Last name must be less than 100 characters"),
+
+  userName: z
+    .string()
+    .trim()
+    .min(1, "Username is required")
+    .min(3, "Username must be at least 3 characters")
+    .max(50, "Username must be less than 50 characters"),
+
+  cfCompany: z
+    .string()
+    .trim()
+    .min(1, "Company / Organization is required")
+    .max(150, "Company must be less than 150 characters"),
+});
+
+export type TUpdateCapeUserSchema = z.infer<typeof UpdateCapeUserSchema>;
+
+/** ============================================ UNENROLL CAPE LEARNER================================= */
+export const UnenrollUserSchema = z.object({
+  userId: z.string().min(1, "User is required."),
+  programs: z
+    .array(
+      z.object({
+        programId: z.string().min(1, "Program ID is required"),
+        source: z.enum(["CLASSROOM", "HYBRID"], {
+          message: "Program source is required",
+        }),
+      }),
+    )
+    .min(1, "Please select at least one program"),
+});
+
+export type TUnenrollUserSchema = z.infer<typeof UnenrollUserSchema>;
+
+/** ============================================ UPDATE CLASSROOM PROGRAM ================================= */
+
+export const UpdateClassroomProgramSchema = z.object({
+  programName: z.string().trim().min(1, "Program Name is Required"),
+  programCohort: z.string().trim().min(1, "Program Cohort is Required"),
+  programDate: z.date({
+    error: "Program Date is required",
+  }),
+  learnerFile: z
+    .union([
+      z
+        .instanceof(File)
+        .refine((file) => ACCEPTED_MIME.includes(file.type), {
+          message: "Only Excel Files (.xlsx, .xls) are allowed",
+        })
+        .refine((file) => file.size <= MAX_FILE_SIZE, {
+          message: "File size must be 10MB or less",
+        }),
+      z.undefined(),
+    ])
+    .optional(),
+  facilitators: z
+    .array(
+      z.object({
+        facilitatorId: z.string().trim().min(1, "Please select a facilitator"),
+      }),
+    )
+    .min(1, "At least one facilitator is required")
+    .superRefine((items, ctx) => {
+      const seen = new Map<string, number>();
+
+      items.forEach((item, index) => {
+        if (!item.facilitatorId) return;
+
+        const existingIndex = seen.get(item.facilitatorId);
+
+        if (existingIndex !== undefined) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Duplicate facilitators are not allowed",
+            path: [existingIndex, "facilitatorId"],
+          });
+
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Duplicate facilitators are not allowed",
+            path: [index, "facilitatorId"],
+          });
+        } else {
+          seen.set(item.facilitatorId, index);
+        }
+      });
+    }),
+});
+
+export type TUpdateClassroomProgramFormInput = z.input<
+  typeof UpdateClassroomProgramSchema
+>;
+export type TUpdateClassroomProgramSchema = z.output<
+  typeof UpdateClassroomProgramSchema
+>;
+
+/** ============================================ UPDATE LEARNWORLDS PROGRAM ================================= */
+
+export const UpdateLearnworldsProgramSchema = z.object({
+  productTitle: z
+    .string()
+    .trim()
+    .min(1, "Program title is required")
+    .max(255, "Program title must not exceed 255 characters"),
+
+  productDescription: z
+    .string()
+    .trim()
+    .min(1, "Program description is required")
+    .max(2000, "Program description must not exceed 2000 characters"),
+
+  productUrl: z
+    .string()
+    .trim()
+    .min(1, "Public URL is required")
+    .max(500, "Public URL must not exceed 500 characters")
+    .refine(
+      (value) => {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Please enter a valid URL",
+      },
+    ),
+});
+
+export type TUpdateLearnworldsProgramFormInput = z.input<
+  typeof UpdateLearnworldsProgramSchema
+>;
+
+export type TUpdateLearnworldsProgramSchema = z.output<
+  typeof UpdateLearnworldsProgramSchema
+>;

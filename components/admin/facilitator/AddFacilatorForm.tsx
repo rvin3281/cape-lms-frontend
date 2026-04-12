@@ -41,7 +41,7 @@ function AddFacilatorForm() {
   const addNewFacilitatorApi = useAddNewFacilitator();
 
   // Form Submission
-  const { isDirty, isValid, isSubmitting } = form.formState;
+  const { isDirty, isValid } = form.formState;
   // API Submit
   const isPending = addNewFacilitatorApi.isPending;
 

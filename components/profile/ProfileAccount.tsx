@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -54,16 +55,13 @@ function ProfileAccount({
     form.reset(originalValues);
   }, [originalValues, form]);
 
-  const { isDirty, isValid, isSubmitting } = form.formState;
+  const { isDirty, isValid } = form.formState;
 
   const onReset = () => {
     form.reset(originalValues);
   };
 
   const updateAccount = useUpdateProfileAccount(userEmail);
-
-  const isDisabled =
-    !isDirty || !isValid || isSubmitting || updateAccount.isPending;
 
   const onSubmit = (values: TUpdateUserProfileAccountSchema) => {
     // Handle form submission logic here

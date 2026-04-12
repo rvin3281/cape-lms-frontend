@@ -6,13 +6,6 @@ type FormErrorAlertProps = {
   title?: string;
 };
 
-const sampleError = { code: "sample-error", message: "sample error message" };
-const sampleErrorData = {
-  code: "sample-error",
-  message: "sample error message",
-  data: {},
-};
-
 function FormAlertErrorWithData({
   errors = [],
   title = "Please fix the following errors",

@@ -1,8 +1,5 @@
 "use client";
 import PageHeader from "@/components/layout/PageHeader";
-import KPILayout from "@/components/learner/dashboard-page/KPILayout";
-import ProgramHomePageLayout from "@/components/learner/dashboard-page/ProgramHomePageLayout";
-import RecentAchievementLayout from "@/components/learner/dashboard-page/RecentAchievementLayout";
 import { selectAuthUser } from "@/lib/redux/feature/auth/authSelectors";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { formatUserName } from "@/utils/formatUserName";

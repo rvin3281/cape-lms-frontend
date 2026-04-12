@@ -1,9 +1,7 @@
 "use client";
 
-import { useLogout } from "@/app/queries/useLogOut";
 import { selectAuthUser } from "@/lib/redux/feature/auth/authSelectors";
-import { clearAuth } from "@/lib/redux/feature/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { useAppSelector } from "@/lib/redux/hooks";
 import { formatUserName } from "@/utils/formatUserName";
 import {
   DropdownMenu,

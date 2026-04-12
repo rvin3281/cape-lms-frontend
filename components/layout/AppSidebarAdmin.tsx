@@ -31,18 +31,22 @@ const data = {
       ],
     },
     {
-      title: "Program Onboarding",
+      title: "CAPE Programs",
       url: "#",
       icon: GiGraduateCap,
       isActive: false,
       items: [
         {
-          title: "View Program Onboarding",
-          url: "/admin/program-onboarding",
+          title: "Classroom Programs",
+          url: "/admin/classroom-programs",
         },
         {
-          title: "New Program Onboarding",
-          url: "/admin/program-onboarding/add-program-onboarding",
+          title: "LearnWorlds Programs",
+          url: "/admin/learnworlds-programs",
+        },
+        {
+          title: "Create Classroom Program",
+          url: "/admin/classroom-programs/create-classroom-program",
         },
       ],
     },
@@ -58,6 +62,12 @@ const data = {
           url: "/cohort",
         },
       ],
+    },
+    {
+      title: "Learners",
+      url: "/admin/cape-learners",
+      icon: MdInsights,
+      isActive: false,
     },
     {
       title: "Insights",

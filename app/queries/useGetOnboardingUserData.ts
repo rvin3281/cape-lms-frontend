@@ -13,6 +13,6 @@ export const useGetOnboardingUserData = (email?: string | null) => {
   return useQuery({
     queryKey: ["user", "onboarding", email],
     queryFn: () => getUserOnboardingData(email!),
-    enabled: !!email, // 🔑 prevent API call until email exists
+    enabled: !!email,
   });
 };

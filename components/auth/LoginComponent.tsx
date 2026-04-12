@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaGithub, FaGoogle } from "react-icons/fa";
-import LoginRedirection from "../loading/LoginRedirection";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import {
@@ -43,9 +42,7 @@ function getVerifyEmailHref(roleCode?: string) {
   }
 }
 
-function getLoginButtonLabel(roleCode?: string, isPending?: boolean) {
-  if (isPending) return "Logging in...";
-
+function getLoginButtonText(roleCode?: string) {
   switch (roleCode) {
     case "INDIVIDUAL_LEARNER":
       return "Sign In as Individual Learner";
@@ -127,7 +124,7 @@ function LoginComponent({
   const { isDirty, isValid, isSubmitting } = form.formState;
 
   const isDisabled =
-    !isDirty || !isValid || isSubmitting || loginAdmin.isPending;
+    !isDirty || !isValid || isSubmitting || loginAdmin.isPending || redirecting;
 
   // watch field values
   const email = form.watch("email");
@@ -171,7 +168,9 @@ function LoginComponent({
         const urlParams = new URLSearchParams(window.location.search);
         const next = urlParams.get("next") || "/dashboard";
 
-        router.replace(next);
+        setTimeout(() => {
+          router.replace(next);
+        }, 300);
       },
       onError: (e) => {
         setRedirecting(false);
@@ -191,9 +190,6 @@ function LoginComponent({
   };
   return (
     <>
-      {redirecting && (
-        <LoginRedirection title="Preparing your dashboard. Please wait." />
-      )}
       {error && <ErrorLogin error={error} />}
 
       <div className="flex flex-col gap-4">
@@ -380,10 +376,12 @@ function LoginComponent({
             {/* Submit Button */}
             <div className="flex mt-6">
               <LoginFormButton
-                btnName={getLoginButtonLabel(roleCode, loginAdmin.isPending)}
                 variant="primary"
                 type="submit"
                 disabled={isDisabled}
+                isLoading={loginAdmin.isPending || redirecting}
+                loadingText="Signing in..."
+                btnName={getLoginButtonText(roleCode)}
                 classname={cn(
                   "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
                   isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",

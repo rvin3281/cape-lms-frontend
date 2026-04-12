@@ -9,6 +9,7 @@ export const SET_PASSWORD_API = "/auth/set-password";
 export const VALIDATE_PASSWORD_TOKEN_API = "/auth/validate-password-token";
 export const GET_ALL_TOTAL_NUMBER_ACTIVE_COURSE = (userId: string) =>
   `/course/get-overall-progress/${userId}`;
+export const GET_ALL_CLASSROOM_PROGRAM_BY_USER = "/user/classroom-program";
 export const GET_ALL_PROGRAM_BY_USER = "/user/all-program";
 export const SSO_USER_PROGRAM = "/user/learnworlds/sso";
 export const ONBOARDING_LEARNER = "/auth/onboarding";
@@ -16,4 +17,6 @@ export const GET_USER_ONBOARDING_DATA = "/user/user-profile";
 export const UPDATE_USER_PROFILE_ACCOUNT = "/user/user-profile/account";
 export const UPDATE_USER_PROFILE_CAREER = "/user/user-profile/career";
 export const USER_PROGRAM_ONBOARDING = "/program/onboard/learner";
+export const LEARNWORLDS_PROGRAM = "/program/learnworlds";
+export const CAPE_USER = "/user/cape";
 export const FACILITITATOR = "/facilitator";

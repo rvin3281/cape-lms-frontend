@@ -37,6 +37,8 @@ import {
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import OnBoardingAddSkills from "./OnBoardingAddSkills";
+import { useAppLogout } from "@/hooks/useAppLogout";
+import AppProcessingOverlay from "../loading/AppProcessingOverlay";
 
 type OnBoardingAccountProps = {
   nextBtnClick: () => void;
@@ -65,6 +67,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
   const [serverErrorCode, setServerErrorCode] = useState<string | undefined>();
 
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const { logout, isLoggingOut } = useAppLogout();
 
   const form = useForm<TOnboardingAccountInformationSchema>({
     resolver: zodResolver(OnboardingAccountInformationSchema),
@@ -248,316 +251,330 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
   }, [hasDtoErrors, hasOnboardingError, form]);
 
   return (
-    <div>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <fieldset disabled={isBusy} className={isBusy ? "opacity-70" : ""}>
-          <FieldGroup>
-            <FieldSet>
-              <FieldLegend>Set Up Your Profile</FieldLegend>
+    <>
+      <AppProcessingOverlay
+        open={isLoggingOut}
+        title="Signing you out"
+        description="Please wait while we end your session securely..."
+      />
+      <div>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <fieldset disabled={isBusy} className={isBusy ? "opacity-70" : ""}>
+            <FieldGroup>
+              <FieldSet>
+                <FieldLegend>Set Up Your Profile</FieldLegend>
 
-              {hasDtoErrors && (
-                <Alert variant="destructive">
-                  <AlertCircleIcon />
-                  <AlertDescription>
-                    <div className="font-medium">
-                      {ServerFormError(serverErrorCode)} {/* <-- title text */}
-                    </div>
-
-                    <ul className="flex flex-col gap-1 text-xs text-red-500">
-                      {dtoError.flatMap((item, idx) =>
-                        (item.messages ?? []).map((msg, j) => (
-                          <li key={`${idx}-${j}`} className="flex gap-1">
-                            <span>*</span>
-                            <p className="line-clamp-none">{msg}</p>
-                          </li>
-                        )),
-                      )}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {hasOnboardingError && (
-                <Alert variant="destructive">
-                  <AlertCircleIcon />
-                  <AlertDescription>
-                    <div className="font-medium">
-                      {ServerFormError(serverErrorCode)} {/* <-- title text */}
-                    </div>
-
-                    <ul className="flex flex-col gap-1 text-xs text-red-500">
-                      {onBoardingError.flatMap((item, idx) => (
-                        <li key={`${idx}}`} className="flex gap-1">
-                          <span>*</span>
-                          <p className="line-clamp-none">
-                            {ServerFormError(item.code)}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <FieldGroup className="gap-3">
-                <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                  <Controller
-                    name="firstName"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field className="gap-1">
-                        <FieldLabel className="mb-1 gap-1" htmlFor="">
-                          First Name <span className="text-red-500">*</span>
-                        </FieldLabel>
-                        <Input
-                          id="first-name"
-                          placeholder="Your First Name"
-                          type="text"
-                          {...field}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-
-                  <Controller
-                    name="lastName"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field className="gap-1">
-                        <FieldLabel className="mb-1 gap-1" htmlFor="">
-                          Last Name <span className="text-red-500">*</span>
-                        </FieldLabel>
-
-                        <Input
-                          id="last-name"
-                          placeholder="Your Last Name"
-                          type="text"
-                          {...field}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                </div>
-                <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="mb-1 gap-1" htmlFor="your-email">
-                        Email <span className="text-red-500">*</span>
-                      </FieldLabel>
-                      <Input
-                        id="your-email"
-                        placeholder="Email"
-                        type="email"
-                        autoComplete="email"
-                        readOnly
-                        {...field}
-                        className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="organization"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel
-                        className="mb-1 gap-1"
-                        htmlFor="your-organization"
-                      >
-                        Organization <span className="text-red-500">*</span>
-                      </FieldLabel>
-                      <Input
-                        id="your-organization"
-                        placeholder="Your Company"
-                        type="text"
-                        readOnly
-                        {...field}
-                        className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="phoneNumber"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="mb-1 gap-1" htmlFor="phone-number">
-                        Phone Number <span className="text-red-500">*</span>
-                      </FieldLabel>
-
-                      <Input
-                        id="phone-number"
-                        placeholder="+60129999999"
-                        type="tel"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                        className="tabular-nums"
-                      />
-
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="jobTitle"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="mb-1 gap-1" htmlFor="job-title">
-                        Job Title <span className="text-red-500">*</span>
-                      </FieldLabel>
-                      <Input
-                        id="job-title"
-                        placeholder="e.g. Software Engineer"
-                        type="text"
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <div className="grid md:grid-cols-2 gap-2 md:gap-4">
-                  <Controller
-                    name="currentRole"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field className="gap-1">
-                        <FieldLabel
-                          className="mb-1 gap-1"
-                          htmlFor="current-role"
-                        >
-                          Current Role <span className="text-red-500">*</span>
-                        </FieldLabel>
-                        <Input
-                          id="current-role"
-                          placeholder="e.g. Junior Developer"
-                          type="text"
-                          {...field}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-
-                  <Controller
-                    name="targetRole"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field className="gap-1">
-                        <FieldLabel
-                          className="mb-1 gap-1"
-                          htmlFor="target-role"
-                        >
-                          Target Role <span className="text-red-500">*</span>
-                        </FieldLabel>
-                        <Input
-                          id="target-role"
-                          placeholder="e.g. Senior Engineer"
-                          type="text"
-                          {...field}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                </div>
-
-                <Controller
-                  name="industry"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="mb-1 gap-1" htmlFor="industry">
-                        Industry <span className="text-red-500">*</span>
-                      </FieldLabel>
-                      <Input
-                        id="industry"
-                        placeholder="e.g. Fintech, Healthcare, E-commerce"
-                        type="text"
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-
-                <Controller
-                  name="careerGoals"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="mb-1 gap-1" htmlFor="career-goals">
-                        Career Goals <span className="text-red-500">*</span>
-                      </FieldLabel>
-
-                      <Textarea
-                        id="career-goals"
-                        rows={5}
-                        placeholder="Describe your career goals..."
-                        {...field}
-                        aria-invalid={fieldState.invalid}
-                      />
-
-                      <div className="flex justify-between items-center mt-1 text-xs text-muted-foreground">
-                        {/* Show error if invalid */}
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-
-                        {/* Show live min/max info */}
-                        <span>
-                          {careerGoalsValue.length} / {maxChars} characters
-                        </span>
+                {hasDtoErrors && (
+                  <Alert variant="destructive">
+                    <AlertCircleIcon />
+                    <AlertDescription>
+                      <div className="font-medium">
+                        {ServerFormError(serverErrorCode)}{" "}
+                        {/* <-- title text */}
                       </div>
 
-                      {/* {fieldState.invalid && (
+                      <ul className="flex flex-col gap-1 text-xs text-red-500">
+                        {dtoError.flatMap((item, idx) =>
+                          (item.messages ?? []).map((msg, j) => (
+                            <li key={`${idx}-${j}`} className="flex gap-1">
+                              <span>*</span>
+                              <p className="line-clamp-none">{msg}</p>
+                            </li>
+                          )),
+                        )}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {hasOnboardingError && (
+                  <Alert variant="destructive">
+                    <AlertCircleIcon />
+                    <AlertDescription>
+                      <div className="font-medium">
+                        {ServerFormError(serverErrorCode)}{" "}
+                        {/* <-- title text */}
+                      </div>
+
+                      <ul className="flex flex-col gap-1 text-xs text-red-500">
+                        {onBoardingError.flatMap((item, idx) => (
+                          <li key={`${idx}}`} className="flex gap-1">
+                            <span>*</span>
+                            <p className="line-clamp-none">
+                              {ServerFormError(item.code)}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <FieldGroup className="gap-3">
+                  <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+                    <Controller
+                      name="firstName"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field className="gap-1">
+                          <FieldLabel className="mb-1 gap-1" htmlFor="">
+                            First Name <span className="text-red-500">*</span>
+                          </FieldLabel>
+                          <Input
+                            id="first-name"
+                            placeholder="Your First Name"
+                            type="text"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+
+                    <Controller
+                      name="lastName"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field className="gap-1">
+                          <FieldLabel className="mb-1 gap-1" htmlFor="">
+                            Last Name <span className="text-red-500">*</span>
+                          </FieldLabel>
+
+                          <Input
+                            id="last-name"
+                            placeholder="Your Last Name"
+                            type="text"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                  <Controller
+                    name="email"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel className="mb-1 gap-1" htmlFor="your-email">
+                          Email <span className="text-red-500">*</span>
+                        </FieldLabel>
+                        <Input
+                          id="your-email"
+                          placeholder="Email"
+                          type="email"
+                          autoComplete="email"
+                          readOnly
+                          {...field}
+                          className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="organization"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel
+                          className="mb-1 gap-1"
+                          htmlFor="your-organization"
+                        >
+                          Organization <span className="text-red-500">*</span>
+                        </FieldLabel>
+                        <Input
+                          id="your-organization"
+                          placeholder="Your Company"
+                          type="text"
+                          readOnly
+                          {...field}
+                          className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="phoneNumber"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel
+                          className="mb-1 gap-1"
+                          htmlFor="phone-number"
+                        >
+                          Phone Number <span className="text-red-500">*</span>
+                        </FieldLabel>
+
+                        <Input
+                          id="phone-number"
+                          placeholder="+60129999999"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                          className="tabular-nums"
+                        />
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="jobTitle"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel className="mb-1 gap-1" htmlFor="job-title">
+                          Job Title <span className="text-red-500">*</span>
+                        </FieldLabel>
+                        <Input
+                          id="job-title"
+                          placeholder="e.g. Software Engineer"
+                          type="text"
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+                    <Controller
+                      name="currentRole"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field className="gap-1">
+                          <FieldLabel
+                            className="mb-1 gap-1"
+                            htmlFor="current-role"
+                          >
+                            Current Role <span className="text-red-500">*</span>
+                          </FieldLabel>
+                          <Input
+                            id="current-role"
+                            placeholder="e.g. Junior Developer"
+                            type="text"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+
+                    <Controller
+                      name="targetRole"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field className="gap-1">
+                          <FieldLabel
+                            className="mb-1 gap-1"
+                            htmlFor="target-role"
+                          >
+                            Target Role <span className="text-red-500">*</span>
+                          </FieldLabel>
+                          <Input
+                            id="target-role"
+                            placeholder="e.g. Senior Engineer"
+                            type="text"
+                            {...field}
+                            aria-invalid={fieldState.invalid}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+
+                  <Controller
+                    name="industry"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel className="mb-1 gap-1" htmlFor="industry">
+                          Industry <span className="text-red-500">*</span>
+                        </FieldLabel>
+                        <Input
+                          id="industry"
+                          placeholder="e.g. Fintech, Healthcare, E-commerce"
+                          type="text"
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="careerGoals"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel
+                          className="mb-1 gap-1"
+                          htmlFor="career-goals"
+                        >
+                          Career Goals <span className="text-red-500">*</span>
+                        </FieldLabel>
+
+                        <Textarea
+                          id="career-goals"
+                          rows={5}
+                          placeholder="Describe your career goals..."
+                          {...field}
+                          aria-invalid={fieldState.invalid}
+                        />
+
+                        <div className="flex justify-between items-center mt-1 text-xs text-muted-foreground">
+                          {/* Show error if invalid */}
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+
+                          {/* Show live min/max info */}
+                          <span>
+                            {careerGoalsValue.length} / {maxChars} characters
+                          </span>
+                        </div>
+
+                        {/* {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )} */}
-                    </Field>
-                  )}
-                />
+                      </Field>
+                    )}
+                  />
 
-                {/* <Field>
+                  {/* <Field>
                 <FieldLabel>Skills You Want to Build</FieldLabel>
 
                 {skills.length > 0 && (
@@ -593,83 +610,94 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
                 </div>
               </Field> */}
 
-                <Controller
-                  name="skills"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field className="gap-1">
-                      <FieldLabel className="gap-1 mb-1">
-                        Skills You Want to Build{" "}
-                        <span className="text-red-500">*</span>
-                      </FieldLabel>
+                  <Controller
+                    name="skills"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-1">
+                        <FieldLabel className="gap-1 mb-1">
+                          Skills You Want to Build{" "}
+                          <span className="text-red-500">*</span>
+                        </FieldLabel>
 
-                      {/* Display badges */}
-                      {field.value && field.value.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {field.value.map((item: string) => (
-                            <Badge
-                              key={item}
-                              variant="secondary"
-                              className="px-3 py-1"
-                            >
-                              <span>{item}</span>
-                              <button
-                                type="button"
-                                onClick={() => removeSkill(item)}
-                                className="ml-2 inline-flex items-center cursor-pointer opacity-70 hover:opacity-100"
-                                aria-label={`Remove ${item}`}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="mt-3 flex items-center gap-2">
-                        {/* Custom component to add skill */}
-                        <OnBoardingAddSkills
-                          skills={field.value || []}
-                          onAdd={addSkill}
-                        />
-
+                        {/* Display badges */}
                         {field.value && field.value.length > 0 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={clearSkills}
-                          >
-                            Clear
-                          </Button>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {field.value.map((item: string) => (
+                              <Badge
+                                key={item}
+                                variant="secondary"
+                                className="px-3 py-1"
+                              >
+                                <span>{item}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeSkill(item)}
+                                  className="ml-2 inline-flex items-center cursor-pointer opacity-70 hover:opacity-100"
+                                  aria-label={`Remove ${item}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
                         )}
-                      </div>
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-            </FieldSet>
-          </FieldGroup>
-        </fieldset>
+                        <div className="mt-3 flex items-center gap-2">
+                          {/* Custom component to add skill */}
+                          <OnBoardingAddSkills
+                            skills={field.value || []}
+                            onAdd={addSkill}
+                          />
 
-        <div className="flex mt-4 items-end justify-end gap-3">
-          <Button variant="destructive" type="button" disabled={isPending}>
-            Logout
-          </Button>
-          <Button disabled={!isDirty || !isValid || isBusy} type="submit">
-            {isBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isRedirecting
-              ? "Redirecting..."
-              : isPending
-                ? "Saving..."
-                : "Complete"}
-          </Button>
-        </div>
-      </form>
-    </div>
+                          {field.value && field.value.length > 0 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              onClick={clearSkills}
+                            >
+                              Clear
+                            </Button>
+                          )}
+                        </div>
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                </FieldGroup>
+              </FieldSet>
+            </FieldGroup>
+          </fieldset>
+
+          <div className="flex mt-4 items-end justify-end gap-3">
+            <Button
+              className="cursor-pointer"
+              variant="destructive"
+              type="button"
+              disabled={isPending}
+              onClick={logout}
+            >
+              Logout
+            </Button>
+            <Button
+              className="cursor-pointer"
+              disabled={!isDirty || !isValid || isBusy}
+              type="submit"
+            >
+              {isBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isRedirecting
+                ? "Redirecting..."
+                : isPending
+                  ? "Saving..."
+                  : "Complete"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
 export default OnBoardingAccount;

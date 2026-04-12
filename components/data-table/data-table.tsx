@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="text-center text-sm text-slate-500"
                 >
-                  No facilitators found.
+                  No data found.
                 </TableCell>
               </TableRow>
             )}

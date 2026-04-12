@@ -127,7 +127,8 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
     role === "hybrid" ? hybridFirstLogin : classroomFirstLogin;
 
   const { isValid, isSubmitting } = form.formState;
-  const isDisabled = !isValid || isSubmitting || activeMutation.isPending;
+  const isDisabled =
+    !isValid || isSubmitting || activeMutation.isPending || redirecting;
 
   // Form Submission Handler
   const handleSuccessfulValidation = (response: any) => {
@@ -156,8 +157,6 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
 
   const handleMutationError = (error: any) => {
     setRedirecting(false);
-
-    console.log("error", error.response);
 
     const resolved = resolveFormError(error);
 
@@ -230,8 +229,6 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
 
   return (
     <>
-      {redirecting && <LoginRedirection title={content.loadingText} />}
-
       <div className="flex flex-col gap-4 my-4">
         <Card className="border border-blue-200 bg-blue-50/60 rounded-xl py-3 my-3">
           <CardContent className="flex flex-col gap-1">
@@ -280,14 +277,12 @@ function FirstTimeLoginComponent({ role }: FirstTimeLoginComponentProps) {
 
             <div className="flex mt-6">
               <LoginFormButton
-                btnName={
-                  activeMutation.isPending
-                    ? "Validating..."
-                    : content.submitButtonText
-                }
+                btnName={content.submitButtonText}
                 variant="primary"
                 type="submit"
                 disabled={isDisabled}
+                isLoading={activeMutation.isPending || redirecting}
+                loadingText="Validating..."
                 classname={cn(
                   "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
                   isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",

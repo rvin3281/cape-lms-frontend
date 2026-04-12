@@ -39,6 +39,9 @@ function ProgramCard({
   rating = "4.8/5",
   progress = 0,
 }: ProgramCardProps) {
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+  console.log("LW PROGRAM URL:", process.env.NEXT_PUBLIC_LW_PROGRAM_ENROLL_URL);
+
   const ssoAuthUserProgram = useProgramSSOAuth();
 
   const redirectUserToCoursePlayer = (
@@ -50,7 +53,13 @@ function ProgramCard({
       return;
     }
 
-    const redirectUrl = `https://cape-dev-test.learnworlds.com/program-player?program=${productId}`;
+    const redirectUrl = `${process.env.NEXT_PUBLIC_LW_PROGRAM_ENROLL_URL}?program=${productId}`;
+
+    console.log("Initiating SSO for:", {
+      userEmail,
+      productId,
+      redirectUrl,
+    });
 
     const toastId = toast.loading("Preparing your learning experience...");
 

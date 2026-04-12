@@ -152,7 +152,7 @@ function ProgramOnboardingForm() {
           );
           resetFormState();
 
-          router.push("/admin/program-onboarding");
+          router.push("/admin/classroom-programs");
         } catch (unexpectedError) {
           console.log(
             "[ProgramOnboarding] Exception occurred while handling onSuccess:",

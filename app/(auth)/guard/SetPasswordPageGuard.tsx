@@ -3,7 +3,6 @@
 import { useValidateSetPasswordToken } from "@/app/queries/useValidateSetPasswordToken";
 import LoginRedirection from "@/components/loading/LoginRedirection";
 import { Button } from "@/components/ui/button";
-import { resolveFormError } from "@/utils/formErrorResponseHandler";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
@@ -40,7 +39,7 @@ function SetPasswordPageGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!query.isError) return;
 
-    const resolved = resolveFormError(query.error);
+    // const resolved = resolveFormError(query.error);
     const message =
       "We could not verify your password setup link. Please request a new one.";
 
@@ -78,10 +77,10 @@ function SetPasswordPageGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (query.isError) {
-    const resolved = resolveFormError(query.error);
-    const message =
-      resolved.message ||
-      "We could not verify your password setup link. Please request a new one.";
+    // const resolved = resolveFormError(query.error);
+    // const message =
+    //   resolved.message ||
+    //   "We could not verify your password setup link. Please request a new one.";
 
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">

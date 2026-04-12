@@ -11,7 +11,6 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
-import { Button } from "../ui/button";
 
 type DeleteDialogProps = {
   open: boolean;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export type AuthUser = {
@@ -8,6 +9,7 @@ export type AuthUser = {
   roleId: string;
   roleCode: string;
   authScope: string;
+  role: any;
 };
 
 type AuthState = {

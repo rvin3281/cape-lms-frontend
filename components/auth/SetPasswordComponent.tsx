@@ -74,7 +74,11 @@ function SetPasswordComponent() {
   const { isDirty, isValid, isSubmitting } = form.formState;
 
   const isDisabled =
-    !isDirty || !isValid || isSubmitting || setPassword.isPending;
+    !isDirty ||
+    !isValid ||
+    isSubmitting ||
+    setPassword.isPending ||
+    redirecting;
 
   const onSubmit = (data: TFirstTimeSetPasswordSchema) => {
     setError(null);
@@ -107,7 +111,9 @@ function SetPasswordComponent() {
           );
         }
 
-        router.replace(`/login`);
+        setTimeout(() => {
+          router.replace(`/login`);
+        }, 300);
       },
       onError: (error: any) => {
         setRedirecting(false);
@@ -130,7 +136,6 @@ function SetPasswordComponent() {
 
   return (
     <>
-      {redirecting && <LoginRedirection title="Redirecting to Login Page" />}
       <div className="flex flex-col gap-2 my-4">
         <Card
           className={`border border-blue-200 bg-blue-50/60 rounded-xl py-3 my-3 ${
@@ -226,12 +231,12 @@ function SetPasswordComponent() {
           {/* Submit Button */}
           <div className="flex mt-6">
             <LoginFormButton
-              btnName={
-                setPassword.isPending ? "Setting Password..." : "Set Password"
-              }
+              btnName="Set Password"
               variant="primary"
               type="submit"
               disabled={isDisabled}
+              isLoading={setPassword.isPending || redirecting}
+              loadingText="Creating your password..."
               classname={cn(
                 "w-full h-12 rounded-xl font-semibold shadow-sm hover:shadow-md transition",
                 isDisabled && "opacity-60 cursor-not-allowed hover:shadow-sm",

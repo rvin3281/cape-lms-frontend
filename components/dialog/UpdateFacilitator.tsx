@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Controller, useForm } from "react-hook-form";
@@ -10,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import {
   FacilatorSchema,
@@ -19,7 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { useUpdateFacilitator } from "@/app/queries/useUpdateFacilitator";
 import { toast } from "sonner";
 import FormAlertError from "../error-ui/FormAlertError";
@@ -70,8 +70,6 @@ function UpdateFacilitatorDialog({
   const updateFacilitatorApi = useUpdateFacilitator();
 
   const { isPending } = updateFacilitatorApi;
-
-  console.log("IS PENDING", isPending);
 
   const onSubmit = (values: TFacilatorSchema) => {
     if (isPending) return null;

@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getDashboardHomeByRole } from "@/utils/get-dashboard-home";
-import SyncLoader from "react-spinners/SyncLoader";
 import DashboardContentSkeleton from "./DashboardContentSkeleton";
 
 type User = {

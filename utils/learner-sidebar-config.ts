@@ -10,7 +10,11 @@ export const LEARNER_SIDEBAR_CONFIG_BY_ROLE: Record<
   INDIVIDUAL_LEARNER: [],
   CLASSROOM_LEARNER: [
     { title: "Dashboard", url: "/dashboard", icon: FaHome },
-    { title: "My Programs", url: "/programs", icon: BookOpen },
+    {
+      title: "Classroom Programs",
+      icon: BookOpen,
+      items: [{ title: "My Classroom Sessions", url: "/classroom-program" }],
+    },
     { title: "Achievements", url: "/achievement", icon: Award },
     { title: "Profile", url: "/profile", icon: UserRound },
   ],
@@ -19,13 +23,13 @@ export const LEARNER_SIDEBAR_CONFIG_BY_ROLE: Record<
     { title: "Dashboard", url: "/dashboard", icon: FaHome },
     { title: "Skills", url: "/skills", icon: Brain },
     {
-      title: "Programs",
+      title: "Hybrid Programs",
       icon: BookOpen,
       items: [
-        { title: "My Programs", url: "/programs" },
+        { title: "My Learning", url: "/hybrid-program" },
         {
           title: "Recommended Programs",
-          url: "/programs/recommended-programs",
+          url: "/hybrid-program/recommended-programs",
         },
       ],
     },
