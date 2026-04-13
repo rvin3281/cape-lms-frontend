@@ -1,7 +1,12 @@
 "use client";
-import { FaHome } from "react-icons/fa";
+import {
+  FaBookOpen,
+  FaChalkboardTeacher,
+  FaHome,
+  FaUserGraduate,
+} from "react-icons/fa";
 import { GiGraduateCap } from "react-icons/gi";
-import { MdInsights } from "react-icons/md";
+import { MdInsights, MdOutlineDashboardCustomize } from "react-icons/md";
 import { Sidebar, SidebarContent, SidebarFooter } from "../ui/sidebar";
 import AppSidebarHeader from "./AppSidebarHeader";
 import NavMain from "./NavMain";
@@ -17,7 +22,7 @@ const data = {
     {
       title: "Facilitator",
       url: "#",
-      icon: GiGraduateCap,
+      icon: FaChalkboardTeacher,
       isActive: false,
       items: [
         {
@@ -33,7 +38,7 @@ const data = {
     {
       title: "CAPE Programs",
       url: "#",
-      icon: GiGraduateCap,
+      icon: MdOutlineDashboardCustomize,
       isActive: false,
       items: [
         {
@@ -54,32 +59,26 @@ const data = {
     {
       title: "Courses",
       url: "#",
-      icon: GiGraduateCap,
+      icon: FaBookOpen,
       isActive: false,
       items: [
         {
           title: "View All Courses",
-          url: "/cohort",
+          url: "/admin/courses",
         },
       ],
     },
     {
       title: "Learners",
       url: "/admin/cape-learners",
-      icon: MdInsights,
+      icon: FaUserGraduate,
       isActive: false,
     },
     {
       title: "Insights",
-      url: "#",
+      url: "/admin/insights",
       icon: MdInsights,
       isActive: false,
-      items: [
-        {
-          title: "Cohort",
-          url: "/dashboard/insights/cohort",
-        },
-      ],
     },
   ],
 };

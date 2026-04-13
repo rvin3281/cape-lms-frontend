@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Laptop, MoreHorizontal, Users } from "lucide-react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type CapeUserColumnsProps = {
@@ -67,7 +67,7 @@ export const getCapeUserColumns = ({
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "userName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Username" />
     ),
@@ -123,11 +123,19 @@ export const getCapeUserColumns = ({
         <div className="flex flex-col gap-2">
           {roleCodes.map((roleCode: string, id: number) =>
             roleCode === "HYBRID_LEARNER" ? (
-              <Badge variant="default" key={id}>
+              <Badge
+                key={id}
+                className="bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-100"
+              >
+                <Laptop className="w-3 h-3 mr-1" />
                 Hybrid Learner
               </Badge>
             ) : roleCode === "CLASSROOM_LEARNER" ? (
-              <Badge variant="destructive" key={id}>
+              <Badge
+                key={id}
+                className="bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-100"
+              >
+                <Users className="w-3 h-3 mr-1" />
                 Classroom Learner
               </Badge>
             ) : (
@@ -184,9 +192,13 @@ export const getCapeUserColumns = ({
       return (
         <div className="font-medium truncate">
           {isFirstTimeLogin ? (
-            <Badge variant="destructive">Not Activated</Badge>
+            <Badge className="bg-amber-100 text-amber-700 border border-amber-200">
+              Not Activated
+            </Badge>
           ) : (
-            <Badge variant="default">Activated</Badge>
+            <Badge className="bg-green-100 text-green-700 border border-green-200">
+              Activated
+            </Badge>
           )}
         </div>
       );

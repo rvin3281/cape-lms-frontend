@@ -15,7 +15,7 @@ export const LEARNER_SIDEBAR_CONFIG_BY_ROLE: Record<
       icon: BookOpen,
       items: [{ title: "My Classroom Sessions", url: "/classroom-program" }],
     },
-    { title: "Achievements", url: "/achievement", icon: Award },
+    { title: "Achievements", url: "/achievements", icon: Award },
     { title: "Profile", url: "/profile", icon: UserRound },
   ],
 
@@ -33,7 +33,7 @@ export const LEARNER_SIDEBAR_CONFIG_BY_ROLE: Record<
         },
       ],
     },
-    { title: "Achievements", url: "/achievement", icon: Award },
+    { title: "Achievements", url: "/achievements", icon: Award },
     { title: "Profile", url: "/profile", icon: UserRound },
   ],
 };
