@@ -15,6 +15,7 @@ import { useUpdateCapeUser } from "@/app/queries/useUpdateCapeUser";
 import { toast } from "sonner";
 import CustomDrawerHeader from "./CustomDrawerHeader";
 import ConfirmActionAlert from "../alert/ConfirmActionAlert";
+import WarningAlertDialog from "../alert/WarningAlertDialog";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type UpdateCapeUserProps = {
@@ -34,7 +35,9 @@ function UpdateCapeUser({
 }: UpdateCapeUserProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  console.log("capeUser in UpdateCapeUser:", capeUser);
+  const [warningOpen, setWarningOpen] = useState(false);
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningDescription, setWarningDescription] = useState("");
 
   const form = useForm<TUpdateCapeUserSchema>({
     resolver: zodResolver(UpdateCapeUserSchema),
@@ -53,6 +56,7 @@ function UpdateCapeUser({
   const handleDrawerOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
       setConfirmOpen(false);
+      setWarningOpen(false);
     }
 
     onOpenChange(nextOpen);
@@ -62,6 +66,9 @@ function UpdateCapeUser({
     if (open && capeUser) {
       setShowError(false);
       setConfirmOpen(false);
+      setWarningOpen(false);
+      setWarningTitle("");
+      setWarningDescription("");
 
       form.reset({
         firstName: capeUser.firstName?.trim() || "",
@@ -88,7 +95,15 @@ function UpdateCapeUser({
     };
 
     updateCapeUserApi.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (data: any) => {
+        const warnings: string[] = data?.data?.warnings ?? [];
+
+        if (warnings.length > 0) {
+          setWarningTitle("Update CAPE Learner completed with warning");
+          setWarningDescription(warnings.join("\n\n"));
+          setWarningOpen(true);
+        }
+
         setConfirmOpen(false);
         setShowError(false);
         onOpenChange(false);
@@ -290,6 +305,14 @@ function UpdateCapeUser({
         cancelText="Cancel"
         isLoading={isPending}
         onConfirm={handleConfirmedSubmit}
+      />
+
+      <WarningAlertDialog
+        open={warningOpen}
+        onOpenChange={setWarningOpen}
+        title={warningTitle}
+        description={warningDescription}
+        buttonText="Understood"
       />
     </>
   );
