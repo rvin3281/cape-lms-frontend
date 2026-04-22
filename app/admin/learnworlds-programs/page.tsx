@@ -1,6 +1,12 @@
 import LearnworldsProgramTable from "@/components/features/learnworlds-program/learnworlds-program-table";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "LearnWorlds Program Management | CAPE-LMS",
+  description:
+    "Manage LearnWorlds programs in CAPE-LMS and keep program details, learner assignments, and enrollment records aligned across both platforms.",
+};
+
 function page() {
   return (
     <>

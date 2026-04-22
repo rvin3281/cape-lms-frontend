@@ -1,6 +1,12 @@
 import CapeUserTable from "@/components/features/cape-user/cape-user-table";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Learner Management | CAPE-LMS",
+  description:
+    "Manage CAPE learners across classroom and online programs, including learner details, enrollments, and account records in CAPE-LMS.",
+};
+
 function page() {
   return (
     <>

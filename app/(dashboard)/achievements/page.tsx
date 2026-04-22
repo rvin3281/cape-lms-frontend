@@ -1,6 +1,12 @@
 import PageUnderDevelopment from "@/components/custom-ui/PageUnderDevelopment";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Achievements | CAPE-LMS",
+  description:
+    "View achievements, learning milestones, and progress highlights from your classroom learning journey in CAPE-LMS.",
+};
+
 function page() {
   return (
     <>

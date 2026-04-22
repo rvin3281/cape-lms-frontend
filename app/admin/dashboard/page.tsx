@@ -1,6 +1,12 @@
 import PageUnderDevelopment from "@/components/custom-ui/PageUnderDevelopment";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Cape Admin Dashboard | CAPE-LMS",
+  description:
+    "Access the CAPE-LMS admin dashboard to monitor platform activity, track key metrics, and manage learners, programs, and cohorts.",
+};
+
 async function DashboardAdminPage() {
   return (
     <>

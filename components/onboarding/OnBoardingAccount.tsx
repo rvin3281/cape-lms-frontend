@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useCompleteOnBoarding } from "@/app/queries/useCompleteOnBoarding";
@@ -39,6 +40,7 @@ import { Textarea } from "../ui/textarea";
 import OnBoardingAddSkills from "./OnBoardingAddSkills";
 import { useAppLogout } from "@/hooks/useAppLogout";
 import AppProcessingOverlay from "../loading/AppProcessingOverlay";
+import { Switch } from "../ui/switch";
 
 type OnBoardingAccountProps = {
   nextBtnClick: () => void;
@@ -83,6 +85,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
       industry: "",
       careerGoals: "",
       skills: [],
+      isAlumni: false,
     },
     mode: "onChange",
   });
@@ -142,6 +145,7 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
       industry: "",
       careerGoals: "",
       skills: skills.length > 0 ? skills : [],
+      isAlumni: false,
     });
   }, [onBoardingUserData?.email]);
 
@@ -659,6 +663,63 @@ function OnBoardingAccount({ nextBtnClick }: OnBoardingAccountProps) {
                               Clear
                             </Button>
                           )}
+                        </div>
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    name="isAlumni"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field className="gap-2">
+                        <div
+                          className={`group relative overflow-hidden rounded-2xl border bg-background px-5 py-4 shadow-sm transition-all duration-200 ${
+                            fieldState.invalid
+                              ? "border-destructive/60 ring-1 ring-destructive/20"
+                              : "border-border/80 hover:border-primary/30 hover:shadow-md"
+                          }`}
+                        >
+                          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+
+                          <div className="flex items-center justify-between gap-5">
+                            <div className="min-w-0 pr-2">
+                              <FieldLabel className="mb-1 flex items-center gap-1 text-[15px] font-semibold leading-none text-foreground">
+                                Are you a UTP Alumni?{" "}
+                                <span className="text-red-500">*</span>
+                              </FieldLabel>
+
+                              <p className="text-sm leading-relaxed text-muted-foreground">
+                                Turn this on if you graduated from UTP
+                              </p>
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-4">
+                              <span
+                                className={`inline-flex min-w-[52px] justify-center rounded-full border px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
+                                  field.value
+                                    ? "border-primary/20 bg-primary/10 text-primary shadow-sm"
+                                    : "border-border bg-muted/50 text-muted-foreground"
+                                }`}
+                              >
+                                {field.value ? "Yes" : "No"}
+                              </span>
+                              {/* border border-border/70 bg-muted/30 shadow-sm */}
+                              <div className="flex items-center justify-center rounded-full px-2 py-1 ">
+                                <Switch
+                                  size="default"
+                                  checked={Boolean(field.value)}
+                                  onCheckedChange={field.onChange}
+                                  aria-label="Are you a UTP Alumni?"
+                                  className="scale-125 data-[state=unchecked]:bg-muted-foreground/30"
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
                         {fieldState.invalid && (

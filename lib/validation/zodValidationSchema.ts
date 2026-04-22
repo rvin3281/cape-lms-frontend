@@ -116,6 +116,7 @@ export const OnboardingAccountInformationSchema = z.object({
     .array(z.string().min(1, "Skill cannot be empty")) // each skill must be non-empty
     .min(1, "Please add at least one skill") // at least one skill required
     .max(20, "You can add up to 20 skills only"), // optional max limit
+  isAlumni: z.boolean(),
 });
 
 export type TOnboardingAccountInformationSchema = z.infer<
@@ -142,6 +143,7 @@ export const UpdateUserProfileCareerSchema = z.object({
     .array(z.string().min(1, "Skill cannot be empty")) // each skill must be non-empty
     .min(1, "Please add at least one skill") // at least one skill required
     .max(20, "You can add up to 20 skills only"), // optional max limit
+  isAlumni: z.boolean(),
 });
 
 export type TUpdateUserProfileCareerSchema = z.infer<

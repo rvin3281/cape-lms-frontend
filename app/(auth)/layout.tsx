@@ -37,8 +37,8 @@ function LoginLayout({ children }: Readonly<{ children: React.ReactNode }>) {
                       <Image
                         src="/images/cape-logo/cape-logo.png"
                         alt="cape logo"
-                        width={220}
-                        height={110}
+                        width={300}
+                        height={140}
                         priority
                       />
                     </div>

@@ -1,6 +1,12 @@
 import PageUnderDevelopment from "@/components/custom-ui/PageUnderDevelopment";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Courses | CAPE-LMS",
+  description:
+    "View and manage course offerings available across the CAPE-LMS platform, including courses delivered through integrated learning systems.",
+};
+
 function page() {
   return (
     <>

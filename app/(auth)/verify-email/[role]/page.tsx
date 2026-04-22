@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import FirstTimeLoginComponent from "@/components/auth/FirstTimeLoginComponent";
 import LoginHeader from "@/components/auth/LoginHeader";
 import LoginFormContainer from "../../../../components/auth/LoginFormContainer";
@@ -16,16 +17,24 @@ const verifyEmailPageContent: Record<
   {
     title: string;
     description: string;
+    metadataTitle: string;
+    metadataDescription: string;
   }
 > = {
   hybrid: {
     title: "Verify your email",
     description: "Enter your registered email to begin first-time setup.",
+    metadataTitle: "Verify Email | Hybrid Learner | CAPE-LMS",
+    metadataDescription:
+      "Verify your registered email to begin first-time account setup for your hybrid learning access in CAPE-LMS.",
   },
   classroom: {
     title: "Verify your classroom email",
     description:
       "Enter your registered classroom email to begin first-time setup.",
+    metadataTitle: "Verify Email | Classroom Learner | CAPE-LMS",
+    metadataDescription:
+      "Verify your registered classroom email to begin first-time account setup and access your classroom learning portal in CAPE-LMS.",
   },
 };
 
@@ -34,6 +43,27 @@ type FirstLoginPageProps = {
     role: string;
   }>;
 };
+
+export async function generateMetadata({
+  params,
+}: FirstLoginPageProps): Promise<Metadata> {
+  const { role } = await params;
+
+  if (!isValidRole(role)) {
+    return {
+      title: "Verify Email | CAPE-LMS",
+      description:
+        "Verify your email to begin your first-time account setup in CAPE-LMS.",
+    };
+  }
+
+  const content = verifyEmailPageContent[role];
+
+  return {
+    title: content.metadataTitle,
+    description: content.metadataDescription,
+  };
+}
 
 async function FirstLoginPage({ params }: FirstLoginPageProps) {
   const { role } = await params;
@@ -54,9 +84,7 @@ async function FirstLoginPage({ params }: FirstLoginPageProps) {
           />
         </div>
 
-        {/* <Suspense fallback={<div className="mt-4">Loading...</div>}> */}
         <FirstTimeLoginComponent role={role} />
-        {/* </Suspense> */}
       </div>
     </LoginFormContainer>
   );

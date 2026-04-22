@@ -1,6 +1,12 @@
 import ProgramOnboardingForm from "@/components/admin/program-onboarding-ui/ProgramOnboardingForm";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Create Program Onboarding | CAPE-LMS",
+  description:
+    "Set up a new classroom program in CAPE-LMS by adding program details, assigning facilitators, and uploading learner information.",
+};
+
 function ProgramOnboardingPage() {
   return (
     <>

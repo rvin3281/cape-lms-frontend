@@ -94,6 +94,8 @@ function ProfileTabs() {
 
   const userData: IGetUserOnBoardingProfile = data.data.userData;
 
+  console.log("Loaded onboarding profile data:", userData);
+
   const accountData: IUserAccount = {
     email: userData.email,
     firstName: userData.firstName,
@@ -112,6 +114,7 @@ function ProfileTabs() {
     industry: userData.profile.industry,
     targetRole: userData.profile.targetRole,
     skills: userData.profile.skills,
+    isAlumni: userData.profile.isAlumni,
   };
 
   return (
@@ -141,7 +144,11 @@ function ProfileTabs() {
           </TabsContent>
 
           <TabsContent value="career">
-            <ProfileCareer title="Career Aspiration" data={careerData} />
+            <ProfileCareer
+              userEmail={email}
+              title="Career Aspiration"
+              data={careerData}
+            />
           </TabsContent>
         </Tabs>
       </div>

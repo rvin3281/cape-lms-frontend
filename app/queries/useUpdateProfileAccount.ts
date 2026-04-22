@@ -21,13 +21,18 @@ export const useUpdateProfileAccount = (email: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateProfile", "account"],
+    mutationKey: ["updateProfile", "account", email],
     mutationFn: (data: TUpdateUserProfileAccountSchema) =>
       updateUserProfileAccounts({ email, data }),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["user", "onboarding", email],
+      });
+
+      await queryClient.refetchQueries({
+        queryKey: ["user", "onboarding", email],
+        exact: true,
       });
     },
   });

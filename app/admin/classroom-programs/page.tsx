@@ -1,6 +1,12 @@
 import ProgramOnboardingTable from "@/components/features/program-onboarding/program-onboarding-table";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Program Onboarding | CAPE-LMS",
+  description:
+    "View and manage classroom program onboarding in CAPE-LMS, including learner enrollment, facilitator assignment, and program details.",
+};
+
 function page() {
   return (
     <>

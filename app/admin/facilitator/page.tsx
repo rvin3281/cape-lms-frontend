@@ -1,6 +1,12 @@
 import FacilitatorTable from "@/components/features/facilitator/columns/facilitator-table";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Facilitator List | CAPE-LMS",
+  description:
+    "View and manage facilitator records in CAPE-LMS, including assigned facilitators for classroom programs and learning activities.",
+};
+
 function page() {
   return (
     <>

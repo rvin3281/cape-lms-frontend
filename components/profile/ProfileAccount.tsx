@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -12,6 +10,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -36,14 +35,14 @@ function ProfileAccount({
 
   const originalValues = useMemo<TUpdateUserProfileAccountSchema>(() => {
     return {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      organization: organization,
-      phoneNumber: phoneNumber,
-      jobTitle: jobTitle,
+      firstName,
+      lastName,
+      email,
+      organization,
+      phoneNumber,
+      jobTitle,
     };
-  }, [data]);
+  }, [firstName, lastName, email, organization, phoneNumber, jobTitle]);
 
   const form = useForm<TUpdateUserProfileAccountSchema>({
     resolver: zodResolver(UpdateUserProfileAccountSchema),
@@ -64,32 +63,57 @@ function ProfileAccount({
   const updateAccount = useUpdateProfileAccount(userEmail);
 
   const onSubmit = (values: TUpdateUserProfileAccountSchema) => {
-    // Handle form submission logic here
-    // console.log("Form submitted with values:", values);
     updateAccount.mutate(values, {
-      onSuccess: (data: any) => {},
+      onSuccess: (response: any) => {
+        toast.success("Profile updated successfully.");
+
+        const updatedUser = response?.data?.userData || response?.data;
+
+        form.reset({
+          firstName: updatedUser?.firstName ?? values.firstName,
+          lastName: updatedUser?.lastName ?? values.lastName,
+          email: updatedUser?.email ?? values.email,
+          organization:
+            updatedUser?.profile?.organization ??
+            updatedUser?.organization ??
+            values.organization,
+          phoneNumber:
+            updatedUser?.profile?.phoneNumber ??
+            updatedUser?.phoneNumber ??
+            values.phoneNumber,
+          jobTitle:
+            updatedUser?.profile?.jobTitle ??
+            updatedUser?.jobTitle ??
+            values.jobTitle,
+        });
+      },
+      onError: () => {
+        toast.error(
+          "Failed to update profile. Please contact technical administrator.",
+        );
+      },
     });
   };
+
+  const isSubmitting = updateAccount.isPending;
 
   return (
     <ProfileTabLayout title={title}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <fieldset>
+        <fieldset disabled={isSubmitting}>
           <FieldGroup>
-            {/* FIRST NAME */}
             <Controller
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="gap-1">
-                  <FieldLabel className="mb-1 gap-1" htmlFor="">
+                  <FieldLabel className="mb-1 gap-1">
                     First Name <span className="text-red-500">*</span>
                   </FieldLabel>
                   <Input
                     id="first-name"
                     placeholder="Your First Name"
                     type="text"
-                    // defaultValue={firstName}
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />
@@ -100,21 +124,18 @@ function ProfileAccount({
               )}
             />
 
-            {/* LAST NAME */}
             <Controller
               name="lastName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field className="gap-1">
-                  <FieldLabel className="mb-1 gap-1" htmlFor="">
+                  <FieldLabel className="mb-1 gap-1">
                     Last Name <span className="text-red-500">*</span>
                   </FieldLabel>
-
                   <Input
                     id="last-name"
                     placeholder="Your Last Name"
                     type="text"
-                    // defaultValue={lastName}
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />
@@ -125,7 +146,6 @@ function ProfileAccount({
               )}
             />
 
-            {/* EMAIL */}
             <Controller
               name="email"
               control={form.control}
@@ -140,9 +160,8 @@ function ProfileAccount({
                     type="email"
                     autoComplete="email"
                     readOnly
-                    // value={email}
                     {...field}
-                    className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
+                    className="cursor-not-allowed border-muted bg-muted text-muted-foreground"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -152,7 +171,6 @@ function ProfileAccount({
               )}
             />
 
-            {/* ORGANIZATION */}
             <Controller
               name="organization"
               control={form.control}
@@ -169,9 +187,8 @@ function ProfileAccount({
                     placeholder="Your Company"
                     type="text"
                     readOnly
-                    // value={organization}
                     {...field}
-                    className="cursor-not-allowed bg-muted text-muted-foreground border-muted"
+                    className="cursor-not-allowed border-muted bg-muted text-muted-foreground"
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -181,7 +198,6 @@ function ProfileAccount({
               )}
             />
 
-            {/* PHONE NUMBER */}
             <Controller
               name="phoneNumber"
               control={form.control}
@@ -190,7 +206,6 @@ function ProfileAccount({
                   <FieldLabel className="mb-1 gap-1" htmlFor="phone-number">
                     Phone Number <span className="text-red-500">*</span>
                   </FieldLabel>
-
                   <Input
                     id="phone-number"
                     placeholder="+60129999999"
@@ -200,9 +215,7 @@ function ProfileAccount({
                     {...field}
                     aria-invalid={fieldState.invalid}
                     className="tabular-nums"
-                    // defaultValue={phoneNumber}
                   />
-
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -224,7 +237,6 @@ function ProfileAccount({
                     type="text"
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    // defaultValue={jobTitle}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -235,27 +247,28 @@ function ProfileAccount({
           </FieldGroup>
         </fieldset>
 
-        <div className="flex mt-6 items-start justify-start gap-2">
+        <div className="mt-6 flex items-start justify-start gap-2">
           <Button
             className="cursor-pointer"
             variant="destructive"
             type="button"
-            disabled={!isDirty}
+            disabled={!isDirty || isSubmitting}
             onClick={onReset}
           >
             Reset
           </Button>
-          {/* <Button disabled={!isDirty || !isValid || isBusy} type="submit"> */}
+
           <Button
-            disabled={!isDirty || !isValid}
+            disabled={!isDirty || !isValid || isSubmitting}
             className="cursor-pointer"
             type="submit"
           >
-            Save
+            {isSubmitting ? "Saving..." : "Save"}
           </Button>
         </div>
       </form>
     </ProfileTabLayout>
   );
 }
+
 export default ProfileAccount;

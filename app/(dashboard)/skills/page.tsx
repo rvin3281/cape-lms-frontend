@@ -1,6 +1,12 @@
 import PageUnderDevelopment from "@/components/custom-ui/PageUnderDevelopment";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Skills | CAPE-LMS",
+  description:
+    "Explore skill development, learning focus areas, and progress tracking within your CAPE-LMS learning journey.",
+};
+
 function page() {
   return (
     <>

@@ -1,6 +1,12 @@
 import PageUnderDevelopment from "@/components/custom-ui/PageUnderDevelopment";
 import PageHeader from "@/components/layout/PageHeader";
 
+export const metadata = {
+  title: "Insights | CAPE-LMS",
+  description:
+    "Explore insights and analytics in CAPE-LMS, including learner engagement, program performance, and overall platform activity.",
+};
+
 function page() {
   return (
     <>
